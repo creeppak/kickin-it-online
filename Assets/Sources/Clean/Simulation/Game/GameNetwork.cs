@@ -75,8 +75,8 @@ namespace Sources.Clean.Simulation
 
         void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input)
         {
-            // var inputData = _inputCollector.CollectInput(runner);
-            // input.Set(inputData);
+            var inputData = _inputCollector.CollectInput(runner);
+            input.Set(inputData);
         }
 
         void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)

@@ -25,6 +25,8 @@ namespace Sources.Clean.Simulation
             builder.RegisterComponent(playerManager);
             
             builder.Register<InputCollector>(Lifetime.Singleton);
+
+            builder.Register<IInputWriter, SimpleMoveInputWriter>(Lifetime.Singleton);
         }
     }
 }

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using Fusion;
 using R3;
 using Stateless;
 using UnityEngine;
-using VContainer;
 
 namespace Sources.Clean.Simulation
 {
@@ -29,9 +27,12 @@ namespace Sources.Clean.Simulation
             EndMatch,
             ForceTerminate
         }
+        
+        private const int CountdownSteps = 3;
+        private const float CountdownStepDuration = 1f;
 
         public Observable<SimulationPhase> Phase => _phase;
-        public Observable<int> Countdown => throw new NotImplementedException();
+        public Observable<int> Countdown => _countdown;
         public int PlayerCount => throw new NotImplementedException();
         public string SessionCode => _simulationArgs.sessionCode;
 
@@ -40,6 +41,7 @@ namespace Sources.Clean.Simulation
         private readonly ReactiveProperty<SimulationPhase> _phase = new(SimulationPhase.Inactive);
         private readonly StateMachine<State, Trigger> _stateMachine;
         private readonly PlayerManager _playerManager;
+        private readonly BehaviorSubject<int> _countdown = new(CountdownSteps);
 
         public GameSimulation(SimulationArgs simulationArgs, GameNetwork network, PlayerManager playerManager)
         {
@@ -48,7 +50,16 @@ namespace Sources.Clean.Simulation
             _network = network;
 
             _stateMachine = new StateMachine<State, Trigger>(State.Inactive);
-            
+            ConfigureStateMachine();
+        }
+
+        async ValueTask IAsyncDisposable.DisposeAsync()
+        {
+            await _stateMachine.FireAsync(Trigger.ForceTerminate); // exit active state
+        }
+
+        private void ConfigureStateMachine()
+        {
             _stateMachine.OnTransitionCompleted(OnStateMachineTransition);
             
             _stateMachine.Configure(State.Inactive)
@@ -60,8 +71,6 @@ namespace Sources.Clean.Simulation
                 .Permit(Trigger.ForceTerminate, State.Inactive)
                 .OnEntryAsync(StartSimulationInternal)
                 .OnExitAsync(TerminateSimulationInternal);
-            
-            // todo telegraph states outside
 
             var waitingForPlayersDisposables = new DisposableBag();
             _stateMachine.Configure(State.WaitingForPlayers)
@@ -80,12 +89,16 @@ namespace Sources.Clean.Simulation
             var countdownDisposables = new DisposableBag();
             _stateMachine.Configure(State.Countdown)
                 .SubstateOf(State.Active)
-                .Permit(Trigger.StartMatch, State.Inactive)
+                .Permit(Trigger.StartMatch, State.InProgress)
                 .OnEntry(() =>
                 {
-                    Observable.Interval(TimeSpan.FromSeconds(1))
-                        .Take(3)
-                        .Subscribe(_ => _stateMachine.Fire(Trigger.StartMatch))
+                    Observable.Return(CountdownSteps) // emit initial value immediately
+                        .Concat(Observable.Interval(TimeSpan.FromSeconds(CountdownStepDuration))
+                            .Scan(CountdownSteps, (count, _) => count - 1))
+                        .TakeWhile(count => count > 0)
+                        .Subscribe(
+                            onNext: count => _countdown.OnNext(count),
+                            onCompleted: _ => _stateMachine.Fire(Trigger.StartMatch))
                         .AddTo(ref countdownDisposables);
                 })
                 .OnExit(() => countdownDisposables.Dispose());
@@ -95,37 +108,13 @@ namespace Sources.Clean.Simulation
                 .Permit(Trigger.EndMatch, State.Finished)
                 .OnEntry(() =>
                 {
+                    Debug.Log("Match has started!");
                     // todo enable ball spawner
                 })
                 .OnExit(() =>
                 {
                     // todo disable ball spawner
                 });
-        }
-
-        private void OnStateMachineTransition(StateMachine<State, Trigger>.Transition obj)
-        {
-            switch (obj.Destination)
-            {
-                case State.Inactive:
-                    _phase.Value = SimulationPhase.Inactive;
-                    break;
-                case State.WaitingForPlayers:
-                    _phase.Value = SimulationPhase.WaitingForPlayers;
-                    break;
-                case State.Countdown:
-                    _phase.Value = SimulationPhase.Countdown;
-                    break;
-                case State.InProgress:
-                    _phase.Value = SimulationPhase.InProgress;
-                    break;
-                case State.Finished:
-                    _phase.Value = SimulationPhase.Finished;
-                    break;
-                case State.Active:
-                default:
-                    return;
-            }
         }
 
         public async UniTask StartSimulation() => await _stateMachine.FireAsync(Trigger.StartSimulation);
@@ -153,9 +142,29 @@ namespace Sources.Clean.Simulation
             await _network.ShutdownSession();
         }
 
-        async ValueTask IAsyncDisposable.DisposeAsync()
+        private void OnStateMachineTransition(StateMachine<State, Trigger>.Transition obj)
         {
-            await _stateMachine.FireAsync(Trigger.ForceTerminate); // exiting active state
+            switch (obj.Destination)
+            {
+                case State.Inactive:
+                    _phase.Value = SimulationPhase.Inactive;
+                    break;
+                case State.WaitingForPlayers:
+                    _phase.Value = SimulationPhase.WaitingForPlayers;
+                    break;
+                case State.Countdown:
+                    _phase.Value = SimulationPhase.Countdown;
+                    break;
+                case State.InProgress:
+                    _phase.Value = SimulationPhase.InProgress;
+                    break;
+                case State.Finished:
+                    _phase.Value = SimulationPhase.Finished;
+                    break;
+                case State.Active:
+                default:
+                    return;
+            }
         }
     }
 }

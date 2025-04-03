@@ -13,7 +13,16 @@ namespace Sources.Clean.Presentation
 
         public void NestNewScreen(GameScreen screen)
         {
-            screen.transform.SetParent(_root, false);
+            var screenTransform = (RectTransform) screen.transform;
+            
+            // place into parent
+            screenTransform.SetParent(_root, false);
+            
+            // stretch to fill
+            screenTransform.anchorMin = Vector2.zero;
+            screenTransform.anchorMax = Vector2.one;
+            screenTransform.offsetMin = Vector2.zero;
+            screenTransform.offsetMax = Vector2.zero;
         }
     }
 }

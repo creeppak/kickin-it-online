@@ -24,3 +24,4 @@ MonoBehaviour:
   _prototypes:
   - {fileID: 7299667734606022048, guid: 94fe96daa78f40645bd714ac4d50920f, type: 3}
   - {fileID: 7887264434925035981, guid: 5d92188b6e5548d48b2cc6393a8ec238, type: 3}
+  - {fileID: 8546386899396443129, guid: 1cc021feebc3f2c47b8f0d3fc62a1be8, type: 3}
