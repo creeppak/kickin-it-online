@@ -72,4 +72,6 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-/Assets/Dependencies/Feel/FeelDemos*
+# Removed Odin Inspector assets due to copyright
+/[Aa]ssets/Plugins/Sirenix.meta
+/[Aa]ssets/Plugins/Sirenix/*
