@@ -1,0 +1,14 @@
+﻿using Fusion;
+
+namespace Sources.Clean.Simulation
+{
+    internal class PlayerScore : NetworkBehaviour
+    {
+        [Networked] public int HealthLeft { get; private set; }
+
+        public void ResetScore()
+        {
+            HealthLeft = 5; // todo move to config
+        }
+    }
+}
