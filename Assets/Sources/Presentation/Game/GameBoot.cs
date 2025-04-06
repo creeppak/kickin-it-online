@@ -60,7 +60,7 @@ namespace Sources.Clean.Presentation
             // unload initial scene completely
             SceneManager.UnloadSceneAsync(activeScene);
             
-            // todo try to activate the game state of the currently opened scene instead
+            // todo: try to activate the game state of the currently opened scene instead
         }
     }
 }

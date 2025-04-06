@@ -2,8 +2,11 @@
 {
     public class BackgroundWorkerProxy : IBackgroundWorker
     {
+        private readonly DisabledBackgroundWorker _disabled = new(); // delegate calls to this instance if the original is not set
+        
         private IBackgroundWorker _original;
-        private DisabledBackgroundWorker _disabled = new(); // delegate calls to this instance if the original is not set
+
+        private IBackgroundWorker CurrentWorker => _original ?? _disabled;
 
         public void SetWorker(IBackgroundWorker original)
         {
@@ -12,12 +15,12 @@
 
         public void SetFadeOut()
         {
-            _original.SetFadeOut();
+            CurrentWorker.SetFadeOut();
         }
 
         public void ResetFadeOut()
         {
-            _original.ResetFadeOut();
+            CurrentWorker.ResetFadeOut();
         }
     }
 }
