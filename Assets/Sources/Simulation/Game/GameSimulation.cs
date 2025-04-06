@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using KickinIt.Simulation.Player;
 using R3;
 using Stateless;
 using UnityEngine;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation.Game
 {
     internal class GameSimulation : IGameSimulation, IAsyncDisposable
     {

@@ -1,8 +1,10 @@
-﻿using UnityEngine;
+﻿using KickinIt.Presentation.Game.GameStates;
+using KickinIt.Presentation.Screens;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Metagame
 {
     public class MetaGameScope : GameStateSceneScope
     {
@@ -13,8 +15,8 @@ namespace Sources.Clean.Presentation
         protected override void ConfigureGameStateScope(IContainerBuilder builder)
         {
             builder.RegisterGameScreens(screenPrototypes, screenNester);
-            builder.Register<MetaGameGameStateBoot>(Lifetime.Singleton);
-            builder.RegisterEntryPoint<MetaGameGameStateBoot>()
+            builder.Register<MetaGameBoot>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<MetaGameBoot>()
                 .WithParameter(initialScreenId);
             
             builder.RegisterEntryPointExceptionHandler(Debug.LogException);

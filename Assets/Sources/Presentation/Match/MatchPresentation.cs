@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Text;
 using Cysharp.Threading.Tasks;
+using KickinIt.Simulation;
+using KickinIt.Simulation.Game;
 using R3;
-using Sources.Clean.Simulation;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Match
 {
     public class MatchPresentation : ISimulationProvider
     {
@@ -66,11 +67,5 @@ namespace Sources.Clean.Presentation
             Simulation.TerminateSimulation();
             Simulation = null;
         }
-    }
-
-    public interface ISimulationProvider
-    {
-        Observable<IGameSimulation> SimulationReady { get; }
-        IGameSimulation Simulation { get; }
     }
 }

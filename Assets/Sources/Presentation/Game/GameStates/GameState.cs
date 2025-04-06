@@ -1,6 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Game.GameStates
 {
     public sealed class GameState
     {

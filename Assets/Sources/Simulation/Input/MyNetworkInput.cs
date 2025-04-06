@@ -1,6 +1,9 @@
 ﻿using Fusion;
 
-public struct MyNetworkInput : INetworkInput
+namespace KickinIt.Simulation.Input
 {
-    public float movement;
+    public struct MyNetworkInput : INetworkInput
+    {
+        public float movement;
+    }
 }

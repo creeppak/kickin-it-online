@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Game.GameStates
 {
     public class GameStateManager : IGameStateManager
     {

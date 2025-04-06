@@ -1,9 +1,10 @@
 ﻿using Fusion;
+using KickinIt.Simulation.Track;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation.Player
 {
     internal class PlayerSimulationScope : LifetimeScope
     {
@@ -35,7 +36,7 @@ namespace Sources.Clean.Simulation
             // builder.RegisterEntryPointExceptionHandler(Debug.LogException);
         }
 
-        private Track ResolvePlayerTrack(IObjectResolver resolver)
+        private Track.Track ResolvePlayerTrack(IObjectResolver resolver)
         {
             var trackProvider = resolver.Resolve<TrackProvider>();
             var playerRef = resolver.Resolve<PlayerRef>();

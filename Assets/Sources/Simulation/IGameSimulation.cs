@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using R3;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation
 {
     public interface IGameSimulation
     {

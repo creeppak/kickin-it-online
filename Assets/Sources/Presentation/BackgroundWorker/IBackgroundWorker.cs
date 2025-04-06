@@ -1,4 +1,4 @@
-﻿namespace Sources.Clean.Presentation
+﻿namespace KickinIt.Presentation.BackgroundWorker
 {
     public interface IBackgroundWorker
     {

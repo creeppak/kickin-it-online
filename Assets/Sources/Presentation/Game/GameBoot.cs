@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
+using KickinIt.Presentation.Game.GameStates;
 using R3;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer.Unity;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Game
 {
     public class GameBoot : IStartable
     {

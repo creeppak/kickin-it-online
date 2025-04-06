@@ -1,6 +1,6 @@
 ﻿using VContainer;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Screens
 {
     public static class GameScreenExtensions
     {

@@ -1,4 +1,4 @@
-﻿namespace Sources.Clean.Simulation
+﻿namespace KickinIt.Simulation.Player
 {
     internal class PlayerSimulation : IPlayerSimulation
     {

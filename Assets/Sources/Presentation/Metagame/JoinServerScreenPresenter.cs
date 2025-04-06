@@ -1,10 +1,13 @@
-﻿using R3;
+﻿using KickinIt.Presentation.Game.GameStates;
+using KickinIt.Presentation.Match;
+using KickinIt.Presentation.Screens;
+using R3;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Metagame
 {
     public sealed class JoinServerScreenPresenter : GameScreenPresenter
     {

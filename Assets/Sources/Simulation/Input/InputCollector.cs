@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Fusion;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation.Input
 {
     public class InputCollector
     {

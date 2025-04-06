@@ -1,6 +1,6 @@
 ﻿using Fusion;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation.Player
 {
     internal class PlayerScore : NetworkBehaviour
     {

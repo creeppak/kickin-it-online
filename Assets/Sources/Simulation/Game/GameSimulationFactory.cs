@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using KickinIt.Simulation.Track;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation.Game
 {
     public class GameSimulationFactory
     {

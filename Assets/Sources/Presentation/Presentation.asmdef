@@ -1,6 +1,6 @@
 {
     "name": "Presentation",
-    "rootNamespace": "",
+    "rootNamespace": "KickinIt",
     "references": [
         "GUID:30940f303ce645438e440ea07f52cce8",
         "GUID:77221876cc6b8244180b96e320b1bcd4",

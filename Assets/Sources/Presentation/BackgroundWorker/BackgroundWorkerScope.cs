@@ -1,7 +1,7 @@
 ﻿using VContainer;
 using VContainer.Unity;
 
-namespace Sources.Clean.Presentation.SupportScene
+namespace KickinIt.Presentation.BackgroundWorker
 {
     public class BackgroundWorkerScope : LifetimeScope
     {

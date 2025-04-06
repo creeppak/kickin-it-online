@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Splines;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation.Track
 {
     public class Track : MonoBehaviour
     {

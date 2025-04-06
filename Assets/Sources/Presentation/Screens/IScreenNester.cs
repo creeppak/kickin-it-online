@@ -1,4 +1,6 @@
-﻿namespace Sources.Clean.Presentation
+﻿using KickinIt.View;
+
+namespace KickinIt.Presentation.Screens
 {
     public interface IScreenNester
     {

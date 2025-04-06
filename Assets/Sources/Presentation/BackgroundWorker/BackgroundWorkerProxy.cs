@@ -1,4 +1,4 @@
-﻿namespace Sources.Clean.Presentation.SupportScene
+﻿namespace KickinIt.Presentation.BackgroundWorker
 {
     public class BackgroundWorkerProxy : IBackgroundWorker
     {

@@ -1,19 +1,20 @@
 ﻿using Fusion;
+using KickinIt.Simulation.Input;
 using UnityEngine;
 using VContainer;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation.Player
 {
     public class PlayerMovement : NetworkBehaviour
     {
         [SerializeField] private float speed = 16f;
         
-        private Track _track;
+        private Track.Track _track;
         
         [Networked] private float X { get; set; }
 
         [Inject]
-        private void Construct(Track track)
+        private void Construct(Track.Track track)
         {
             _track = track;
         }

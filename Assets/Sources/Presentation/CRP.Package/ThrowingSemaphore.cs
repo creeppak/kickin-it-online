@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sources.Clean.CRP.Package
+namespace KickinIt.Presentation.CRP.Package
 {
     public class ThrowingSemaphore
     {

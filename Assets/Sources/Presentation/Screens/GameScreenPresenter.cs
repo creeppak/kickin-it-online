@@ -2,7 +2,7 @@
 using UnityEngine;
 using VContainer.Unity;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Screens
 {
     public abstract class GameScreenPresenter : MonoBehaviour, IStartable, IDisposable
     {

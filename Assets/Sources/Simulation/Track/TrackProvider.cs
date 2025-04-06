@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation.Track
 {
     public class TrackProvider : MonoBehaviour
     {

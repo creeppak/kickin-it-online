@@ -1,6 +1,6 @@
 ﻿using UnityEngine.SceneManagement;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Game.GameStates
 {
     public sealed class SceneGameStateActivator : IGameStateActivator
     {

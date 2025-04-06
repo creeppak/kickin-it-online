@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer.Unity;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Game.GameStates
 {
     public class SceneGameStateUnloader : IGameStateUnloader
     {

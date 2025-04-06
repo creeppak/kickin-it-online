@@ -1,9 +1,12 @@
-﻿using Sources.Clean.Simulation;
+﻿using KickinIt.Presentation.Game.GameStates;
+using KickinIt.Presentation.Screens;
+using KickinIt.Simulation.Game;
+using KickinIt.Simulation.Track;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Match
 {
     public class MatchScope : GameStateSceneScope
     {

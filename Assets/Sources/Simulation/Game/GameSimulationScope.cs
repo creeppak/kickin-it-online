@@ -1,9 +1,11 @@
 ﻿using Fusion;
+using KickinIt.Simulation.Input;
+using KickinIt.Simulation.Player;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation.Game
 {
     public class GameSimulationScope : LifetimeScope
     {

@@ -1,13 +1,12 @@
 ﻿using Fusion;
-using UnityEngine;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation.Input
 {
     internal class SimpleMoveInputWriter : IInputWriter
     {
         public MyNetworkInput WriteInput(NetworkRunner networkRunner, MyNetworkInput inputData)
         {
-            var input = Input.GetAxis("Horizontal");
+            var input = UnityEngine.Input.GetAxis("Horizontal");
 
             inputData.movement = input;
 

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Sources.Clean.Presentation.SupportScene
+namespace KickinIt.Presentation.BackgroundWorker
 {
     public class DisabledBackgroundWorker : IBackgroundWorker
     {

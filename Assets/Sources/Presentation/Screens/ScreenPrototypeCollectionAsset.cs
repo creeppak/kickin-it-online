@@ -2,10 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using UnityEngine;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Screens
 {
     [CreateAssetMenu(menuName = "Game/Screen Prototype Collection")]
     public class ScreenPrototypeCollectionAsset : SerializedScriptableObject, IScreenPrototypeProvider

@@ -1,4 +1,4 @@
-﻿namespace Sources.Clean.Presentation
+﻿namespace KickinIt.Presentation.Match
 {
     public struct MatchConfiguration
     {

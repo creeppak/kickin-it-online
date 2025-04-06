@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer;
 using VContainer.Unity;
 
-namespace Sources.Clean.Presentation.SupportScene
+namespace KickinIt.Presentation.BackgroundWorker
 {
-    public class BackgroundWorkerKeeper : IAsyncStartable, IDisposable
+    public class BackgroundWorkerKeeper : IAsyncStartable
     {
         private readonly LifetimeScope _lifetimeScope;
         private readonly BackgroundWorkerProxy _backgroundWorkerProxy;
@@ -35,19 +33,6 @@ namespace Sources.Clean.Presentation.SupportScene
             var backgroundScope = LifetimeScope.Find<BackgroundWorkerScope>(_backgroundScene);
             var worker = backgroundScope.Container.Resolve<IBackgroundWorker>();
             _backgroundWorkerProxy.SetWorker(worker);
-        }
-
-        public async void Dispose()
-        {
-            // var unloadOperation = SceneManager.UnloadSceneAsync(_backgroundScene);
-            //
-            // if (unloadOperation is null)
-            // {
-            //     Debug.Log("Tried unloading background scene, but it was likely the last scene loaded. Ignoring the unload request...");
-            //     return;
-            // }
-            //
-            // await unloadOperation.ToUniTask();
         }
     }
 }

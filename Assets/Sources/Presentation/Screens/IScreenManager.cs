@@ -1,7 +1,6 @@
-﻿using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Screens
 {
     public interface IScreenManager
     {

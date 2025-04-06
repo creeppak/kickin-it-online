@@ -1,7 +1,7 @@
 ﻿using VContainer;
 using VContainer.Unity;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Match
 {
     public class PlayerScope : LifetimeScope
     {

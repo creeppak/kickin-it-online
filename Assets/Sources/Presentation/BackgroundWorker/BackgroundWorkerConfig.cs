@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sources.Clean.Presentation.SupportScene
+namespace KickinIt.Presentation.BackgroundWorker
 {
     [Serializable]
     public class BackgroundWorkerConfig : IBackgroundWorkerConfig

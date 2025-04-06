@@ -5,7 +5,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation.Player
 {
     internal class PlayerManager : MonoBehaviour
     {

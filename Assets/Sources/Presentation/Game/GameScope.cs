@@ -1,10 +1,11 @@
 ﻿using System;
-using Sources.Clean.Presentation.SupportScene;
+using KickinIt.Presentation.BackgroundWorker;
+using KickinIt.Presentation.Game.GameStates;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Game
 {
     public class GameScope : LifetimeScope
     {

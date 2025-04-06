@@ -3,7 +3,7 @@ using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Game.GameStates
 {
     [CreateAssetMenu(menuName = "Game/Scene Game State Prototype Collection")]
     public sealed class GameStateSceneCollection : SerializedScriptableObject, IGameStateSceneProvider

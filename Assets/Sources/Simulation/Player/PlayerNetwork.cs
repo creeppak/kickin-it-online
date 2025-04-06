@@ -2,7 +2,7 @@
 using R3;
 using UnityEngine;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation.Player
 {
     internal class PlayerNetwork : NetworkBehaviour
     {

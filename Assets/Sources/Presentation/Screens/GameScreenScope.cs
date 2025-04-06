@@ -1,9 +1,10 @@
 ﻿using System;
+using KickinIt.View;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Screens
 {
     public sealed class GameScreenScope : LifetimeScope // extract template into CRP.Core
     {

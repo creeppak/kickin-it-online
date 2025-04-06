@@ -1,4 +1,4 @@
-﻿namespace Sources.Clean.Simulation
+﻿namespace KickinIt.Simulation
 {
     public struct SimulationArgs
     {

@@ -1,9 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.View
 {
     public sealed class GameScreen : MonoBehaviour
     {

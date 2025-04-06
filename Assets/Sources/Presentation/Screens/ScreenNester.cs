@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using KickinIt.View;
+using UnityEngine;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Screens
 {
     public class ScreenNester : MonoBehaviour, IScreenNester
     {

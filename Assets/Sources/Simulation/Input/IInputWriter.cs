@@ -1,6 +1,6 @@
 ﻿using Fusion;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation.Input
 {
     public interface IInputWriter
     {

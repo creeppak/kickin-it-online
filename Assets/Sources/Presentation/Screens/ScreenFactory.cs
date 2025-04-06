@@ -1,9 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using KickinIt.View;
 using UnityEngine;
 using VContainer.Unity;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Screens
 {
     public class ScreenFactory
     {

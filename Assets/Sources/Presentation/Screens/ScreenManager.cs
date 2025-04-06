@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using JetBrains.Annotations;
-using Sources.Clean.CRP.Package;
+using KickinIt.Presentation.CRP.Package;
+using KickinIt.View;
 using Object = UnityEngine.Object;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Screens
 {
     public class ScreenManager : IScreenManager
     {

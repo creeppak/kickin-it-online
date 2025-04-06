@@ -1,4 +1,4 @@
-﻿namespace Sources.Clean.Presentation
+﻿namespace KickinIt.Presentation.Game.GameStates
 {
     public interface IGameStateSceneProvider
     {

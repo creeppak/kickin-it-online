@@ -1,3 +1,4 @@
 ﻿{
-  "name": "View"
+  "name": "View",
+  "rootNamespace": "KickinIt"
 }

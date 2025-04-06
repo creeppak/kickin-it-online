@@ -1,8 +1,7 @@
 ﻿using Fusion;
-using UnityEngine;
 using VContainer.Unity;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation.Player
 {
     internal class PlayerSimulationBoot : IStartable
     {

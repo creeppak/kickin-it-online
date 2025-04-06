@@ -1,10 +1,11 @@
-﻿using R3;
-using Sources.Clean.Simulation;
+﻿using KickinIt.Presentation.Screens;
+using KickinIt.Simulation;
+using R3;
 using TMPro;
 using UnityEngine;
 using VContainer;
 
-namespace Sources.Clean.Presentation
+namespace KickinIt.Presentation.Match
 {
     public class AwaitingConnectionScreenPresenter : GameScreenPresenter
     {

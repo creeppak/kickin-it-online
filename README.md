@@ -1,15 +1,20 @@
-﻿# Online Pong Demo Game (WIP)
+﻿# Kickin' It! - Online Pong Demo Game (WIP)
 
 This repository is a demonstration of a scalable multiplayer game architecture using Unity & Photon Fusion 2.
 
 **Please note:** The demo is still a work-in-progress and is not fully functional.
 
+![Metagame Screenshot](Markdown/metagame.png)
+![Match Screenshot](Markdown/match.png)
+
 ## Overview
 
-This project is a multiplayer game built on a scalable architecture that reimagines the classic pong game. In this game:
+This project is a multiplayer game built on a scalable architecture that reimagines the classic pong game (but is 
+actually a Crash Bash clone).
+In this game:
 - One user creates a session.
 - Another user connects to the session using a unique session code.
-- Player compete to determine the winner.
+- Player compete in a pong game to determine the winner.
 
 ## Tech Stack
 
@@ -27,8 +32,9 @@ The project leverages the following technologies:
 ### Starting Point
 
 For an overview of the game setup and architecture, please refer to the following files:
-- `Sources/Presentation/Game/GameBoot.cs`
 - `Sources/Presentation/Game/GameScope.cs`
+- `Sources/Presentation/Metagame/MetaGameScope.cs`
+- `Sources/Presentation/Match/MatchScope.cs`
 
 ### Prerequisites
 
@@ -41,8 +47,14 @@ The core gameplay is a modern take on the classic pong game:
 - **Session Creation:** One player initiates a game session.
 - **Session Join:** A second player can join the session by entering the session code provided.
 - **Player Movement:** Each player controls its own cart to deflect the ball back to the opponent.
-- **Score** When player misses the ball, he loses a point.
-- **Game Over** When player score reaches 0, he loses the game.
+- **Player Health:** When player misses the ball, he loses a health point.
+- **Win/Lose Condition:** When player score reaches 0, he loses the game.
+
+## Controls
+
+Players can control their paddle using the following keys:
+- **A Key:** Move paddle to the left.
+- **D Key:** Move paddle to the right.
 
 ## Future Work
 

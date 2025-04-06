@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Fusion;
 using Fusion.Sockets;
+using KickinIt.Simulation.Input;
+using KickinIt.Simulation.Player;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer;
 
-namespace Sources.Clean.Simulation
+namespace KickinIt.Simulation.Game
 {
     public class GameNetwork : MonoBehaviour, INetworkRunnerCallbacks
     {
