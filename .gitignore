@@ -75,3 +75,7 @@ crashlytics-build.properties
 # Removed Odin Inspector assets due to copyright
 /[Aa]ssets/Plugins/Sirenix.meta
 /[Aa]ssets/Plugins/Sirenix/*
+
+# Hide old reference files not related to public demo
+/[Aa]ssets/Sources/OldReference.meta
+/[Aa]ssets/Sources/OldReference/*
