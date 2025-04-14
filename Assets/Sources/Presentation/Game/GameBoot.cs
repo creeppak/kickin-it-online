@@ -1,67 +1,48 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using KickinIt.Presentation.Game.GameStates;
-using R3;
+using KickinIt.Presentation.Screens;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using VContainer.Unity;
 
-namespace KickinIt.Presentation.Game
+namespace KickinIt.Presentation.Match
 {
-    public class GameBoot : IStartable
+    public class GameBoot : IAsyncStartable, IDisposable
     {
-        private readonly IGameStateManager _gameStateManager;
+        private readonly GamePresenter _presenter;
+        private readonly IScreenManager _screenManager;
+        private readonly ScreenId _initialScreen;
+        private readonly IAppStateManager _appStateManager;
 
-        public GameBoot(IGameStateManager gameStateManager)
+        public GameBoot(ScreenId initialScreen, GamePresenter presenter, IScreenManager screenManager, IAppStateManager appStateManager)
         {
-            _gameStateManager = gameStateManager;
-        }
-        
-        public async void Start()
-        {
-#if !UNITY_EDITOR
-            await BootGame();
-#else
-            await BootGameInEditor();
-#endif
+            _appStateManager = appStateManager;
+            _initialScreen = initialScreen;
+            _screenManager = screenManager;
+            _presenter = presenter;
         }
 
-        private async Task BootGame()
+        public async UniTask StartAsync(CancellationToken cancellation = new())
         {
-            ObservableSystem.RegisterUnhandledExceptionHandler(exception =>
-            {
-                Debug.LogError("Unhandled exception occured in ObservableSystem.");
-                Debug.LogException(exception);
-            });
-            
             try
             {
-                await _gameStateManager.ChangeState(GameStateId.Metagame);
+                // the scene is loaded already
+                await _screenManager.ChangeScreen(_initialScreen);
+                await _presenter.InitializeSimulation();
             }
             catch (Exception e)
             {
+                Debug.LogError("Error occured during simulation initialization. Returning to Metagame state...");
                 Debug.LogException(e);
+                await _appStateManager.ChangeState(AppStateId.Metagame);
+                return;
             }
         }
 
-        private async Task BootGameInEditor()
+        public void Dispose()
         {
-            // unload loaded scene
-            var activeScene = SceneManager.GetActiveScene();
-
-            // deactivate all root game objects
-            foreach (var rootGameObject in activeScene.GetRootGameObjects())
-            {
-                rootGameObject.SetActive(false);
-            }
-            
-            // execute default boot for now
-            await BootGame();
-            
-            // unload initial scene completely
-            SceneManager.UnloadSceneAsync(activeScene);
-            
-            // todo: try to activate the game state of the currently opened scene instead
+            _presenter.TerminateSimulation();
         }
     }
 }

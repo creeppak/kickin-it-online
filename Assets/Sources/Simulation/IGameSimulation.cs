@@ -10,7 +10,7 @@ namespace KickinIt.Simulation
         Observable<SimulationPhase> Phase { get; }
         Observable<int> Countdown { get; }
         IPlayerSimulation GetPlayer(int index);
-        int PlayerCount { get; }
+        // int PlayerCount { get; }
         string SessionCode { get; }
     }
 }

@@ -6,7 +6,7 @@ using VContainer.Unity;
 
 namespace KickinIt.Presentation.Metagame
 {
-    public class MetaGameScope : GameStateSceneScope
+    public class MetaGameScope : AppStateSceneScope
     {
         [SerializeField] private ScreenId initialScreenId;
         [SerializeField] private ScreenPrototypeCollectionAsset screenPrototypes;

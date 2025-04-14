@@ -13,5 +13,10 @@ namespace KickinIt.Presentation.BackgroundWorker
         {
             Debug.LogError($"Ignoring {nameof(ResetFadeOut)} call...");
         }
+
+        public void AddGameObject(GameObject gameObject)
+        {
+            Debug.LogError($"Ignoring {nameof(AddGameObject)} call...");
+        }
     }
 }

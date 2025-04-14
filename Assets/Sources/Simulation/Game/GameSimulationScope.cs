@@ -20,6 +20,8 @@ namespace KickinIt.Simulation.Game
 
             builder.Register<IGameSimulation, GameSimulation>(Lifetime.Singleton);
             
+            // builder.RegisterComponentInHierarchy<>()
+            
             builder.RegisterComponent(networkRunner);
             builder.RegisterComponent(network);
             // builder.Register<PlayerManagerFactory>(Lifetime.Singleton)

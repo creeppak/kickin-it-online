@@ -1,4 +1,6 @@
-﻿namespace KickinIt.Presentation.BackgroundWorker
+﻿using UnityEngine;
+
+namespace KickinIt.Presentation.BackgroundWorker
 {
     public class BackgroundWorkerProxy : IBackgroundWorker
     {
@@ -21,6 +23,11 @@
         public void ResetFadeOut()
         {
             CurrentWorker.ResetFadeOut();
+        }
+
+        public void AddGameObject(GameObject gameObject)
+        {
+            CurrentWorker.AddGameObject(gameObject);
         }
     }
 }

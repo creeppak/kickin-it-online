@@ -50,8 +50,8 @@ namespace KickinIt.Simulation.Game
         private async UniTask StartGame(string sessionCode, GameMode gameMode)
         {
             _networkRunner.ProvideInput = true;
-            var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex);
-
+            
+            var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex); // keep current scene
             if (!scene.IsValid)
             {
                 throw new InvalidOperationException("Scene index is not valid.");
@@ -65,7 +65,7 @@ namespace KickinIt.Simulation.Game
                 GameMode = gameMode,
                 SessionName = _simulationConfig.GameNetworkSessionPrefix + sessionCode,
                 Scene = sceneInfo,
-                SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+                SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
             });
 
             if (!result.Ok)

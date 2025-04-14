@@ -1,49 +1,45 @@
-﻿using System;
-using KickinIt.Presentation.BackgroundWorker;
+﻿using Fusion;
 using KickinIt.Presentation.Game.GameStates;
+using KickinIt.Presentation.Screens;
+using KickinIt.Simulation.Game;
+using KickinIt.Simulation.Track;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VContainer;
 using VContainer.Unity;
 
-namespace KickinIt.Presentation.Game
+namespace KickinIt.Presentation.Match
 {
-    public class GameScope : LifetimeScope
-    {
-        [SerializeField] private GameStateSceneCollection sceneGameStates;
+    public class GameScope : AppStateSceneScope
+    { 
+        [SerializeField] private ScreenId initialScreenId;
+        [SerializeField] private ScreenPrototypeCollectionAsset screenPrototypes;
+        [SerializeField] private ScreenNester screenNester;
+        [FormerlySerializedAs("simulationScopePrototype")] [SerializeField] private GameSimulationScope gameSimulationScopePrototype;
+        [SerializeField] private TrackProvider trackProvider;
+		[SerializeField] private GameSimulationInstaller gameSimulationInstaller;
         
-        protected override void Configure(IContainerBuilder builder)
+        protected override void ConfigureGameStateScope(IContainerBuilder builder)
         {
-            builder.Register<SimpleGameStateFactory>(Lifetime.Transient);
-            builder.Register<SceneGameStateFactory>(Lifetime.Transient);
-            builder.RegisterInstance<IGameStateSceneProvider>(sceneGameStates);
-            builder.Register<IGameStateFactory, MasterGameStateFactory>(Lifetime.Transient);
-            builder.Register<IGameStateManager, GameStateManager>(Lifetime.Singleton);
-            
-            // background worker
-            {
-                builder.RegisterInstance<IBackgroundWorkerConfig>(new BackgroundWorkerConfig
-                    { BackgroundSceneName = "Background Scene" });
-                
-                builder.Register<BackgroundWorkerProxy>(Lifetime.Singleton)
-                    .As<IBackgroundWorker>()
-                    .AsSelf();
+            builder.Register<GamePresenter>(Lifetime.Singleton)
+                .AsImplementedInterfaces()
+                .AsSelf();
+            builder.RegisterGameScreens(screenPrototypes, screenNester);
+			// gameSimulationInstaller.RegisterGameS
 
-                builder.Register<BackgroundWorkerKeeper>(Lifetime.Singleton)
-                    .AsSelf();
-            }
-            
-            builder.UseEntryPoints(pointsBuilder =>
-            {
-                pointsBuilder.Add<BackgroundWorkerKeeper>();
-                pointsBuilder.Add<GameBoot>();
-            });
-            
-            builder.RegisterEntryPointExceptionHandler(OnGameBootException);
-        }
+            // builder.Register<GameSimulationFactory>(Lifetime.Singleton)
+            //     .WithParameter(gameSimulationScopePrototype)
+            //     .WithParameter(trackProvider);
 
-        private void OnGameBootException(Exception obj)
-        {
-            Debug.LogException(obj);
+            // register network runner
+            builder.Register(resolver => resolver.Resolve<NetworkedAppStateArgs>().networkRunner, Lifetime.Singleton);
+            
+            builder.Register<GameBoot>(Lifetime.Singleton);
+            
+            builder.RegisterEntryPoint<GameBoot>()
+                .WithParameter(initialScreenId);
+            
+            builder.RegisterEntryPointExceptionHandler(Debug.LogException);
         }
     }
 }

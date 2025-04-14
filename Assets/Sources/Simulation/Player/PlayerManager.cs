@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Fusion;
+using KickinIt.Simulation.Network;
 using R3;
 using UnityEngine;
 using VContainer;
@@ -29,10 +30,17 @@ namespace KickinIt.Simulation.Player
 
         private void Awake()
         {
-            PlayerNetwork.PlayerSpawnedOnClient
+            ReplicationEventBus<PlayerNetwork>.ReplicatedOnClient
                 .IgnoreOnErrorResume(Debug.LogException)
-                .Subscribe(tuple => OnPlayerSpawnedOnClient(tuple.runner, tuple.obj))
+                .Subscribe(OnPlayerSpawnedOnClient)
                 .AddTo(this);
+        }
+
+        private void OnPlayerSpawnedOnClient(PlayerNetwork networkComponent)
+        {
+            if (networkComponent.Runner != _networkRunner) return;
+            
+            BuildPlayerScope(networkComponent.Object, networkComponent.Object.InputAuthority);
         }
 
         public void InitializeNewPlayer(PlayerRef playerRef)
@@ -61,13 +69,6 @@ namespace KickinIt.Simulation.Player
         private void OnBeforeSpawnedOnServer(NetworkRunner runner, NetworkObject obj, PlayerRef playerRef)
         {
             BuildPlayerScope(obj, playerRef);
-        }
-
-        private void OnPlayerSpawnedOnClient(NetworkRunner runner, NetworkObject obj)
-        {
-            if (runner != _networkRunner) return;
-            
-            BuildPlayerScope(obj, obj.InputAuthority);
         }
 
         private void BuildPlayerScope(NetworkObject obj, PlayerRef playerRef)

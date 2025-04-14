@@ -16,13 +16,13 @@ namespace KickinIt.Presentation.Metagame
         [SerializeField] private Button backButton;
         
         private IScreenManager _screenManager;
-        private IGameStateManager _gameStateManager;
+        private IAppStateManager _appStateManager;
 
         [Inject]
-        public void Configure(IScreenManager screenManager, IGameStateManager gameStateManager)
+        public void Configure(IScreenManager screenManager, IAppStateManager appStateManager)
         {
             _screenManager = screenManager;
-            _gameStateManager = gameStateManager;
+            _appStateManager = appStateManager;
         }
 
         protected override void OnScreenLoaded()
@@ -30,9 +30,9 @@ namespace KickinIt.Presentation.Metagame
             joinButton.OnClickAsObservable()
                 .SelectAwait(async (_, _) =>
                 {
-                    await _gameStateManager.ChangeState(
-                        GameStateId.Match,
-                        new MatchConfiguration
+                    await _appStateManager.ChangeState(
+                        AppStateId.Simulation,
+                        new GameConfiguration
                         {
                             host = false,
                             sessionCode = codeInput.text

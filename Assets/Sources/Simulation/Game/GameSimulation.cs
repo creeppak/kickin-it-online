@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using Fusion;
 using KickinIt.Simulation.Player;
 using R3;
 using Stateless;
 using UnityEngine;
+using VContainer;
 
 namespace KickinIt.Simulation.Game
 {
-    internal class GameSimulation : IGameSimulation, IAsyncDisposable
+    internal class GameSimulation : NetworkBehaviour, IGameSimulation, IAsyncDisposable
     {
         enum State
         {
@@ -34,17 +36,19 @@ namespace KickinIt.Simulation.Game
 
         public Observable<SimulationPhase> Phase => _phase;
         public Observable<int> Countdown => _countdown;
-        public int PlayerCount => throw new NotImplementedException();
+        // public int PlayerCount => throw new NotImplementedException();
         public string SessionCode => _simulationArgs.sessionCode;
-
-        private readonly SimulationArgs _simulationArgs;
-        private readonly GameNetwork _network;
+        
         private readonly ReactiveProperty<SimulationPhase> _phase = new(SimulationPhase.Inactive);
-        private readonly StateMachine<State, Trigger> _stateMachine;
-        private readonly PlayerManager _playerManager;
         private readonly BehaviorSubject<int> _countdown = new(CountdownSteps);
 
-        public GameSimulation(SimulationArgs simulationArgs, GameNetwork network, PlayerManager playerManager)
+        private SimulationArgs _simulationArgs;
+        private GameNetwork _network;
+        private StateMachine<State, Trigger> _stateMachine;
+        private PlayerManager _playerManager;
+
+        [Inject]
+        private void Configure(SimulationArgs simulationArgs, GameNetwork network, PlayerManager playerManager)
         {
             _playerManager = playerManager;
             _simulationArgs = simulationArgs;
@@ -79,10 +83,12 @@ namespace KickinIt.Simulation.Game
                 .Permit(Trigger.StartCountdown, State.Countdown)
                 .OnEntry(() =>
                 {
+                    if (!Object.HasStateAuthority) return;
+                    
                     _playerManager.PlayerCount
                         .Where(count => count >= 2) // todo: make this configurable
                         .Take(1)
-                        .Subscribe(_ => _stateMachine.Fire(Trigger.StartCountdown))
+                        .Subscribe(_ => RPC_FireNetworked(Trigger.StartCountdown))
                         .AddTo(ref waitingForPlayersDisposables);
                 })
                 .OnExit(() => waitingForPlayersDisposables.Dispose());
@@ -93,13 +99,19 @@ namespace KickinIt.Simulation.Game
                 .Permit(Trigger.StartMatch, State.InProgress)
                 .OnEntry(() =>
                 {
+                    // todo utilize TickTimer for better accuracy
                     Observable.Return(CountdownSteps) // emit initial value immediately
                         .Concat(Observable.Interval(TimeSpan.FromSeconds(CountdownStepDuration))
                             .Scan(CountdownSteps, (count, _) => count - 1))
                         .TakeWhile(count => count > 0)
                         .Subscribe(
                             onNext: count => _countdown.OnNext(count),
-                            onCompleted: _ => _stateMachine.Fire(Trigger.StartMatch))
+                            onCompleted: _ =>
+                            {
+                                if (!Object.HasStateAuthority) return;
+
+                                RPC_FireNetworked(Trigger.StartMatch);
+                            })
                         .AddTo(ref countdownDisposables);
                 })
                 .OnExit(() => countdownDisposables.Dispose());
@@ -124,6 +136,12 @@ namespace KickinIt.Simulation.Game
         public IPlayerSimulation GetPlayer(int index)
         {
             throw new NotImplementedException();
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        private void RPC_FireNetworked(Trigger trigger)
+        {
+            _stateMachine.Fire(trigger);
         }
         
         private async Task StartSimulationInternal()

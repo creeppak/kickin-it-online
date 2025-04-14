@@ -1,6 +1,9 @@
-﻿namespace KickinIt.Presentation.BackgroundWorker
+﻿using UnityEngine;
+using UnityEngine.SceneManagement;
+
+namespace KickinIt.Presentation.BackgroundWorker
 {
-    public class BackgroundWorker : IBackgroundWorker
+    public class BackgroundWorker : MonoBehaviour, IBackgroundWorker
     {
         public void SetFadeOut()
         {
@@ -10,6 +13,11 @@
         public void ResetFadeOut()
         {
             throw new System.NotImplementedException();
+        }
+
+        public void AddGameObject(GameObject newBackgroundGameObject)
+        {
+            SceneManager.MoveGameObjectToScene(newBackgroundGameObject, gameObject.scene);
         }
     }
 }

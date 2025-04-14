@@ -1,23 +1,13 @@
 ﻿using Fusion;
-using R3;
-using UnityEngine;
+using KickinIt.Simulation.Network;
 
 namespace KickinIt.Simulation.Player
 {
     internal class PlayerNetwork : NetworkBehaviour
     {
-        private static readonly Subject<(NetworkRunner runner, NetworkObject obj)> _playerSpawnedOnClient = new();
-
-        public static Observable<(NetworkRunner runner, NetworkObject obj)> PlayerSpawnedOnClient => _playerSpawnedOnClient;
-
         public override void Spawned()
         {
-            Debug.Log("I'm called");
-            
-            if (!Runner.IsServer)
-            {
-                _playerSpawnedOnClient.OnNext((Runner, Object));
-            }
+            ReplicationEventBus<PlayerNetwork>.PushAwaken(this);
         }
     }
 }
