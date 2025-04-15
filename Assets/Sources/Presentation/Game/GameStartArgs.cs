@@ -1,6 +1,6 @@
 ﻿namespace KickinIt.Presentation.Match
 {
-    public struct GameConfiguration
+    public struct GameStartArgs
     {
         public bool host;
         public string sessionCode;

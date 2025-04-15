@@ -1,6 +1,7 @@
 ﻿using Fusion;
 using KickinIt.Simulation.Input;
 using KickinIt.Simulation.Player;
+using KickinIt.Simulation.Track;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -9,24 +10,34 @@ namespace KickinIt.Simulation.Game
 {
     public class GameSimulationScope : LifetimeScope
     {
-        [SerializeField] private NetworkRunner networkRunner;
-        [SerializeField] private GameNetwork network;
-        // [SerializeField] private PlayerManager playerManagerPrefab;
+        [SerializeField] private GameSimulation simulation;
         [SerializeField] private PlayerManager playerManager;
+        [SerializeField] private TrackProvider trackProvider;
+
+        private void OnValidate()
+        {
+            if (autoRun)
+            {
+                autoRun = false;
+                Debug.LogError("Disabled autorun option. Build should be run manually.");
+            }
+        }
 
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.Register<ISimulationConfig, HardcodeSimulationConfig>(Lifetime.Singleton);
+            builder.RegisterComponent(simulation)
+                .As<IGameSimulation>();
 
-            builder.Register<IGameSimulation, GameSimulation>(Lifetime.Singleton);
+            builder.Register(resolver =>
+            {
+                var runner = resolver.Resolve<NetworkRunner>();
+                var gameNetwork = runner.gameObject.AddComponent<GameNetwork>();
+                resolver.Inject(gameNetwork);
+                return gameNetwork;
+            }, Lifetime.Singleton);
             
-            // builder.RegisterComponentInHierarchy<>()
-            
-            builder.RegisterComponent(networkRunner);
-            builder.RegisterComponent(network);
-            // builder.Register<PlayerManagerFactory>(Lifetime.Singleton)
-            //     .WithParameter(playerManagerPrefab);
             builder.RegisterComponent(playerManager);
+            builder.RegisterComponent(trackProvider);
             
             builder.Register<InputCollector>(Lifetime.Singleton);
 

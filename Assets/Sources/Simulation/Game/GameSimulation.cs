@@ -6,6 +6,7 @@ using KickinIt.Simulation.Player;
 using R3;
 using Stateless;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using VContainer;
 
 namespace KickinIt.Simulation.Game
@@ -24,11 +25,12 @@ namespace KickinIt.Simulation.Game
 
         enum Trigger
         {
-            StartSimulation,
-            StartCountdown,
-            StartMatch,
-            EndMatch,
-            ForceTerminate
+            None = -1,
+            StartSimulation = 1,
+            StartCountdown = 2,
+            StartMatch = 3,
+            EndMatch = 4,
+            ForceTerminate = 5
         }
         
         private const int CountdownSteps = 3;
@@ -38,6 +40,9 @@ namespace KickinIt.Simulation.Game
         public Observable<int> Countdown => _countdown;
         // public int PlayerCount => throw new NotImplementedException();
         public string SessionCode => _simulationArgs.sessionCode;
+
+        [Networked] private Trigger LastFiredTrigger { get; set; }
+        private Trigger _lastProcessedTrigger = Trigger.None;
         
         private readonly ReactiveProperty<SimulationPhase> _phase = new(SimulationPhase.Inactive);
         private readonly BehaviorSubject<int> _countdown = new(CountdownSteps);
@@ -53,7 +58,10 @@ namespace KickinIt.Simulation.Game
             _playerManager = playerManager;
             _simulationArgs = simulationArgs;
             _network = network;
+        }
 
+        private void Awake()
+        {
             _stateMachine = new StateMachine<State, Trigger>(State.Inactive);
             ConfigureStateMachine();
         }
@@ -63,9 +71,33 @@ namespace KickinIt.Simulation.Game
             await _stateMachine.FireAsync(Trigger.ForceTerminate); // exit active state
         }
 
+        public override void FixedUpdateNetwork()
+        {
+            SyncStateMachine();
+        }
+        
+        public async UniTask StartSimulation() => await _stateMachine.FireAsync(Trigger.StartSimulation);
+        public async UniTask TerminateSimulation() => await _stateMachine.FireAsync(Trigger.ForceTerminate);
+        
+        public IPlayerSimulation GetPlayer(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void SyncStateMachine()
+        {
+            if (Object.HasStateAuthority) return; // no sync on host
+            if (!Runner.IsForward) return;
+            if (_lastProcessedTrigger == LastFiredTrigger) return;
+
+            _lastProcessedTrigger = LastFiredTrigger;
+            _stateMachine.Fire(LastFiredTrigger);
+        }
+
         private void ConfigureStateMachine()
         {
-            _stateMachine.OnTransitionCompleted(OnStateMachineTransition);
+            _stateMachine.OnTransitioned(OnStateMachineTransitioning);
+            _stateMachine.OnTransitionCompleted(OnStateMachineTransitionComplete);
             
             _stateMachine.Configure(State.Inactive)
                 .Permit(Trigger.StartSimulation, State.Active)
@@ -74,7 +106,6 @@ namespace KickinIt.Simulation.Game
             _stateMachine.Configure(State.Active) // master state
                 .InitialTransition(State.WaitingForPlayers)
                 .Permit(Trigger.ForceTerminate, State.Inactive)
-                .OnEntryAsync(StartSimulationInternal)
                 .OnExitAsync(TerminateSimulationInternal);
 
             var waitingForPlayersDisposables = new DisposableBag();
@@ -88,7 +119,7 @@ namespace KickinIt.Simulation.Game
                     _playerManager.PlayerCount
                         .Where(count => count >= 2) // todo: make this configurable
                         .Take(1)
-                        .Subscribe(_ => RPC_FireNetworked(Trigger.StartCountdown))
+                        .Subscribe(_ => _stateMachine.Fire(Trigger.StartCountdown))
                         .AddTo(ref waitingForPlayersDisposables);
                 })
                 .OnExit(() => waitingForPlayersDisposables.Dispose());
@@ -99,8 +130,8 @@ namespace KickinIt.Simulation.Game
                 .Permit(Trigger.StartMatch, State.InProgress)
                 .OnEntry(() =>
                 {
-                    // todo utilize TickTimer for better accuracy
-                    Observable.Return(CountdownSteps) // emit initial value immediately
+                    // todo: utilize Photon's TickTimer for better accuracy
+                    Observable.Return(CountdownSteps) // emits initial value immediately
                         .Concat(Observable.Interval(TimeSpan.FromSeconds(CountdownStepDuration))
                             .Scan(CountdownSteps, (count, _) => count - 1))
                         .TakeWhile(count => count > 0)
@@ -110,7 +141,7 @@ namespace KickinIt.Simulation.Game
                             {
                                 if (!Object.HasStateAuthority) return;
 
-                                RPC_FireNetworked(Trigger.StartMatch);
+                                _stateMachine.Fire(Trigger.StartMatch);
                             })
                         .AddTo(ref countdownDisposables);
                 })
@@ -130,38 +161,17 @@ namespace KickinIt.Simulation.Game
                 });
         }
 
-        public async UniTask StartSimulation() => await _stateMachine.FireAsync(Trigger.StartSimulation);
-        public async UniTask TerminateSimulation() => await _stateMachine.FireAsync(Trigger.ForceTerminate);
-        
-        public IPlayerSimulation GetPlayer(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        private void RPC_FireNetworked(Trigger trigger)
-        {
-            _stateMachine.Fire(trigger);
-        }
-        
-        private async Task StartSimulationInternal()
-        {
-            if (_simulationArgs.host)
-            {
-                await _network.HostNewSession(_simulationArgs.sessionCode);
-            }
-            else
-            {
-                await _network.JoinSession(_simulationArgs.sessionCode);
-            }
-        }
-
         private async Task TerminateSimulationInternal()
         {
             await _network.ShutdownSession();
         }
 
-        private void OnStateMachineTransition(StateMachine<State, Trigger>.Transition obj)
+        private void OnStateMachineTransitioning(StateMachine<State, Trigger>.Transition obj)
+        {
+            LastFiredTrigger = obj.Trigger; // sync network
+        }
+
+        private void OnStateMachineTransitionComplete(StateMachine<State, Trigger>.Transition obj)
         {
             switch (obj.Destination)
             {

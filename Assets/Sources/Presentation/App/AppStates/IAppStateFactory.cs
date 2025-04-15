@@ -5,6 +5,6 @@ namespace KickinIt.Presentation.Game.GameStates
 {
     public interface IAppStateFactory
     {
-        [ItemNotNull] Task<AppState> CreateState<TArgs>(AppStateId stateId, TArgs args);
+        [ItemCanBeNull] Task<AppState> CreateState<TArgs>(AppStateId stateId, TArgs args);
     }
 }

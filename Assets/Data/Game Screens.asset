@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4dd84e05dc244126a22b46fedd269eef, type: 3}
-  m_Name: Match Screens
+  m_Name: Game Screens
   m_EditorClassIdentifier: 
   serializationData:
     SerializedFormat: 2

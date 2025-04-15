@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using KickinIt.Presentation.Game.GameStates;
 using KickinIt.Presentation.Screens;
@@ -8,7 +9,7 @@ using VContainer.Unity;
 
 namespace KickinIt.Presentation.Match
 {
-    public class GameBoot : IAsyncStartable, IDisposable
+    public class GameBoot : IAsyncStartable, IAsyncDisposable
     {
         private readonly GamePresenter _presenter;
         private readonly IScreenManager _screenManager;
@@ -27,22 +28,21 @@ namespace KickinIt.Presentation.Match
         {
             try
             {
-                // the scene is loaded already
                 await _screenManager.ChangeScreen(_initialScreen);
                 await _presenter.InitializeSimulation();
             }
             catch (Exception e)
             {
-                Debug.LogError("Error occured during simulation initialization. Returning to Metagame state...");
+                Debug.LogError("Error occured during the simulation initialization. Returning to Metagame state...");
                 Debug.LogException(e);
                 await _appStateManager.ChangeState(AppStateId.Metagame);
                 return;
             }
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            _presenter.TerminateSimulation();
+            await _presenter.TerminateSimulation();
         }
     }
 }

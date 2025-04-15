@@ -20,7 +20,6 @@ namespace KickinIt.Presentation.Game
             builder.Register<SceneAppStateFactory>(Lifetime.Transient)
                 .AsSelf()
                 .As<IHotLoadAppStateProvider>();
-            builder.Register<NetworkedAppStateFactory>(Lifetime.Transient);
             builder.RegisterInstance<IAppStateSceneProvider>(sceneGameStates);
             builder.Register<IAppStateFactory, MasterAppStateFactory>(Lifetime.Transient);
             builder.Register<IAppStateManager, AppStateManager>(Lifetime.Singleton);
@@ -46,6 +45,8 @@ namespace KickinIt.Presentation.Game
             });
             
             builder.RegisterEntryPointExceptionHandler(OnGameBootException);
+
+            builder.Register<AsyncDisposingSystem>(Lifetime.Scoped);
         }
 
         private void OnGameBootException(Exception obj)

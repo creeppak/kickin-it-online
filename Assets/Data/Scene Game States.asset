@@ -23,11 +23,11 @@ MonoBehaviour:
     SerializationNodes:
     - Name: _sceneNameById
       Entry: 7
-      Data: 0|System.Collections.Generic.Dictionary`2[[Sources.Clean.Presentation.GameStateId,
+      Data: 0|System.Collections.Generic.Dictionary`2[[KickinIt.Presentation.Game.GameStates.AppStateId,
         Presentation],[System.String, mscorlib]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[Sources.Clean.Presentation.GameStateId,
+      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[KickinIt.Presentation.Game.GameStates.AppStateId,
         Presentation]], mscorlib
     - Name: 
       Entry: 12
@@ -61,7 +61,7 @@ MonoBehaviour:
       Data: 2
     - Name: $v
       Entry: 1
-      Data: Match
+      Data: Game Presentation
     - Name: 
       Entry: 8
       Data: 

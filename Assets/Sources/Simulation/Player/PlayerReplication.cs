@@ -3,11 +3,11 @@ using KickinIt.Simulation.Network;
 
 namespace KickinIt.Simulation.Player
 {
-    internal class PlayerNetwork : NetworkBehaviour
+    internal class PlayerReplication : NetworkBehaviour
     {
         public override void Spawned()
         {
-            ReplicationEventBus<PlayerNetwork>.PushAwaken(this);
+            ReplicationEventBus<PlayerReplication>.PushSpawned(this);
         }
     }
 }

@@ -30,17 +30,17 @@ namespace KickinIt.Simulation.Player
 
         private void Awake()
         {
-            ReplicationEventBus<PlayerNetwork>.ReplicatedOnClient
+            ReplicationEventBus<PlayerReplication>.ReplicatedOnClient
                 .IgnoreOnErrorResume(Debug.LogException)
                 .Subscribe(OnPlayerSpawnedOnClient)
                 .AddTo(this);
         }
 
-        private void OnPlayerSpawnedOnClient(PlayerNetwork networkComponent)
+        private void OnPlayerSpawnedOnClient(PlayerReplication replicationComponent)
         {
-            if (networkComponent.Runner != _networkRunner) return;
+            if (replicationComponent.Runner != _networkRunner) return;
             
-            BuildPlayerScope(networkComponent.Object, networkComponent.Object.InputAuthority);
+            BuildPlayerScope(replicationComponent.Object, replicationComponent.Object.InputAuthority);
         }
 
         public void InitializeNewPlayer(PlayerRef playerRef)

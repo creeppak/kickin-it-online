@@ -8,13 +8,12 @@ namespace KickinIt.Presentation.Game.GameStates
     {
         private readonly IAppStateFactory[] _factories;
 
-        public MasterAppStateFactory(SimpleAppStateFactory simpleAppStateFactory, SceneAppStateFactory sceneAppStateFactory, NetworkedAppStateFactory networkedAppStateFactory)
+        public MasterAppStateFactory(SimpleAppStateFactory simpleAppStateFactory, SceneAppStateFactory sceneAppStateFactory)
         {
             _factories = new IAppStateFactory[]
             {
                 simpleAppStateFactory,
-                sceneAppStateFactory,
-                networkedAppStateFactory
+                sceneAppStateFactory
             };
         }
 

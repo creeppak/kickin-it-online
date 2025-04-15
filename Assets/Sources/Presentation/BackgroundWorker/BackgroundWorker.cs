@@ -15,7 +15,7 @@ namespace KickinIt.Presentation.BackgroundWorker
             throw new System.NotImplementedException();
         }
 
-        public void AddGameObject(GameObject newBackgroundGameObject)
+        public void AddGameObject(GameObject newBackgroundGameObject) // todo: remove?
         {
             SceneManager.MoveGameObjectToScene(newBackgroundGameObject, gameObject.scene);
         }

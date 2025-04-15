@@ -1,5 +1,6 @@
 ﻿using Fusion;
 using R3;
+using UnityEngine;
 
 namespace KickinIt.Simulation.Network
 {
@@ -9,9 +10,11 @@ namespace KickinIt.Simulation.Network
         
         public static Observable<TNetworkComponent> ReplicatedOnClient => _replicatedOnClientSubject;
         
-        public static void PushAwaken(TNetworkComponent component)
+        public static void PushSpawned(TNetworkComponent component)
         {
             if (component.Runner.IsServer) { return; }
+            
+            Debug.Log($"Pushing spawned event for {component.GetType().Name}. Frame: {Time.frameCount}");
             
             _replicatedOnClientSubject.OnNext(component);
         }

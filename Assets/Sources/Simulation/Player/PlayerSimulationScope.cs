@@ -1,6 +1,7 @@
 ﻿using Fusion;
 using KickinIt.Simulation.Track;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VContainer;
 using VContainer.Unity;
 
@@ -8,7 +9,7 @@ namespace KickinIt.Simulation.Player
 {
     internal class PlayerSimulationScope : LifetimeScope
     {
-        [SerializeField] private PlayerNetwork network;
+        [FormerlySerializedAs("network")] [SerializeField] private PlayerReplication replication;
         [SerializeField] private PlayerMovement movement;
         [SerializeField] private PlayerScore score;
 
@@ -23,7 +24,7 @@ namespace KickinIt.Simulation.Player
 
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterComponent(network);
+            builder.RegisterComponent(replication);
             builder.RegisterComponent(movement);
             builder.RegisterComponent(score);
             

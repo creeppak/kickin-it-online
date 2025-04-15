@@ -18,12 +18,10 @@ namespace KickinIt.Presentation.Metagame
         
         private IScreenManager _screenManager;
         private IAppStateManager _appStateManager;
-        private ConnectionSystem _connectionSystem;
 
         [Inject]
-        private void Configure(IScreenManager screenManager, IAppStateManager appStateManager, ConnectionSystem connectionSystem)
+        private void Configure(IScreenManager screenManager, IAppStateManager appStateManager)
         {
-            _connectionSystem = connectionSystem;
             _appStateManager = appStateManager;
             _screenManager = screenManager;
         }
@@ -33,25 +31,10 @@ namespace KickinIt.Presentation.Metagame
             hostButton.OnClickAsObservable()
                 .SelectAwait(async (_, _) =>
                 {
-                    NetworkRunner networkRunner;
-                    try
-                    {
-                        networkRunner = await _connectionSystem.InitiateNetworkConnection(new ConnectionArgs
-                        {
-                            host = true
-                        });
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError("Error occured while starting host."); // todo show fancy error screen
-                        Debug.LogException(e);
-                        throw;
-                    }
-                    
                     // network ready, change state to simulation
-                    await _appStateManager.ChangeState(AppStateId.Simulation, new NetworkedAppStateArgs
+                    await _appStateManager.ChangeState(AppStateId.Simulation, new GameStartArgs
                     {
-                        networkRunner = networkRunner
+                        host = true
                     });
                     return Unit.Default;
                 }, AwaitOperation.Drop)

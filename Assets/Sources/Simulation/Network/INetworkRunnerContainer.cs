@@ -2,7 +2,7 @@
 
 namespace KickinIt.Simulation.Network
 {
-    internal interface INetworkRunnerContainer
+    public interface INetworkRunnerContainer
     {
         NetworkRunner Current { get; }
         NetworkRunner InitializeNew();

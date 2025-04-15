@@ -32,7 +32,7 @@ namespace KickinIt.Presentation.Metagame
                 {
                     await _appStateManager.ChangeState(
                         AppStateId.Simulation,
-                        new GameConfiguration
+                        new GameStartArgs
                         {
                             host = false,
                             sessionCode = codeInput.text

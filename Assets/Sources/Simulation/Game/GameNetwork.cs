@@ -13,66 +13,24 @@ namespace KickinIt.Simulation.Game
 {
     public class GameNetwork : MonoBehaviour, INetworkRunnerCallbacks
     {
-        private ISimulationConfig _simulationConfig;
         private NetworkRunner _networkRunner;
         private InputCollector _inputCollector;
-        // private PlayerManagerFactory _playerManagerFactory;
         private PlayerManager _playerManager;
 
         [Inject]
-        // private void Construct(ISimulationConfig simulationConfig, NetworkRunner networkRunner, InputCollector inputCollector, PlayerManagerFactory playerManagerFactory)
-        private void Construct(ISimulationConfig simulationConfig, NetworkRunner networkRunner, InputCollector inputCollector, PlayerManager playerManager)
+        private void Construct(NetworkRunner networkRunner, InputCollector inputCollector, PlayerManager playerManager)
         {
             // _playerManagerFactory = playerManagerFactory;
             _playerManager = playerManager;
             _networkRunner = networkRunner;
-            _simulationConfig = simulationConfig;
             _inputCollector = inputCollector;
-        }
-        
-        internal async UniTask JoinSession(string sessionCode)
-        {
-            await StartGame(sessionCode, GameMode.Client);
-        }
-
-        internal async UniTask HostNewSession(string sessionCode)
-        {
-            await StartGame(sessionCode, GameMode.Host);
-            
-            // _playerManager = _playerManagerFactory.Create();
         }
         
         internal async UniTask ShutdownSession()
         {
+            var simulationScene = gameObject.scene;
             await _networkRunner.Shutdown();
-        }
-
-        private async UniTask StartGame(string sessionCode, GameMode gameMode)
-        {
-            _networkRunner.ProvideInput = true;
-            
-            var scene = SceneRef.FromIndex(SceneManager.GetActiveScene().buildIndex); // keep current scene
-            if (!scene.IsValid)
-            {
-                throw new InvalidOperationException("Scene index is not valid.");
-            }
-            
-            var sceneInfo = new NetworkSceneInfo();
-            sceneInfo.AddSceneRef(scene, LoadSceneMode.Additive);
-
-            var result = await _networkRunner.StartGame(new StartGameArgs
-            {
-                GameMode = gameMode,
-                SessionName = _simulationConfig.GameNetworkSessionPrefix + sessionCode,
-                Scene = sceneInfo,
-                SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
-            });
-
-            if (!result.Ok)
-            {
-                throw new Exception(
-                    $"Game network component initialization failed. Shutdown reason: {result.ShutdownReason}. Custom error data: {result.ErrorMessage}. Stacktrace:\n{result.StackTrace}.");
-            }
+            await SceneManager.UnloadSceneAsync(simulationScene);
         }
 
         void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input)

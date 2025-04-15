@@ -9,65 +9,68 @@ namespace KickinIt.Presentation.Match
 {
     public class GamePresenter : ISimulationProvider
     {
-        private readonly GameConfiguration _gameConfiguration;
-
+        private readonly GameStartArgs _gameStartArgs;
+        private readonly IGameSimulationFactory _simulationFactory;
         private readonly Subject<IGameSimulation> _simulationReady = new();
         
         private string _sessionCode;
-        private IGameSimulation _gameSimulation;
-
-        public Observable<IGameSimulation> SimulationReady => _simulationReady;
 
         public IGameSimulation Simulation { get; private set; }
 
-        public GamePresenter(GameConfiguration configuration, IGameSimulation gameSimulation)
+        public Observable<IGameSimulation> SimulationReady => _simulationReady;
+
+        public GamePresenter(GameStartArgs startArgs, IGameSimulationFactory simulationFactory)
         {
-            _gameSimulation = gameSimulation;
-            _gameConfiguration = configuration;
+            _simulationFactory = simulationFactory;
+            _gameStartArgs = startArgs;
         }
 
         public async UniTask InitializeSimulation()
         {
-            throw new NotImplementedException();
+            if (Simulation is not null)
+            {
+                throw new InvalidOperationException("Simulation is already initialized.");
+            }
             
-            // if (Simulation is not null)
-            // {
-            //     throw new InvalidOperationException("Simulation is already initialized.");
-            // }
-            //
-            // _sessionCode = _gameConfiguration.host ? GenerateSessionCode() : _gameConfiguration.sessionCode;
-            // var simulationConfig = BuildSimulationConfig();
-            // Simulation = _simulationFactory.Create(simulationConfig);
-            // await Simulation.StartSimulation();
-            // _simulationReady.OnNext(Simulation);
-            // return;
-            //
-            // string GenerateSessionCode() // todo: use backend to avoid collisions
-            // {
-            //     var sb = new StringBuilder();
-            //         
-            //     for (var i = 0; i < 6; i++)
-            //     {
-            //         sb.Append(UnityEngine.Random.Range(0, 10));
-            //     }
-            //
-            //     return sb.ToString();
-            // }
-            //
-            // SimulationArgs BuildSimulationConfig()
-            // {
-            //     return new SimulationArgs
-            //     {
-            //         host = _gameConfiguration.host,
-            //         sessionCode = _sessionCode,
-            //     };
-            // }
+            _sessionCode = _gameStartArgs.host ? GenerateSessionCode() : _gameStartArgs.sessionCode;
+            var simulationConfig = BuildSimulationConfig();
+            Simulation = await _simulationFactory.Create(simulationConfig);
+            
+            await Simulation.StartSimulation();
+            
+            _simulationReady.OnNext(Simulation);
+            return;
+
+            SimulationArgs BuildSimulationConfig()
+            {
+                return new SimulationArgs
+                {
+                    host = _gameStartArgs.host,
+                    sessionCode = _sessionCode,
+                };
+            }
         }
 
-        public void TerminateSimulation()
+        public async UniTask TerminateSimulation()
         {
-            Simulation.TerminateSimulation();
+            if (Simulation != null)
+            {
+                await Simulation.TerminateSimulation();
+            }
+            
             Simulation = null;
+        }
+
+        private string GenerateSessionCode()
+        {
+            var sb = new StringBuilder();
+                    
+            for (var i = 0; i < 6; i++)
+            {
+                sb.Append(UnityEngine.Random.Range(0, 10));
+            }
+            
+            return sb.ToString();
         }
     }
 }
