@@ -3,6 +3,7 @@ using KickinIt.Simulation.Input;
 using KickinIt.Simulation.Player;
 using KickinIt.Simulation.Track;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VContainer;
 using VContainer.Unity;
 
@@ -12,6 +13,7 @@ namespace KickinIt.Simulation.Game
     {
         [SerializeField] private GameSimulation simulation;
         [SerializeField] private PlayerManager playerManager;
+        [FormerlySerializedAs("playerRegistry")] [SerializeField] private PlayerRegistry playerRegistry;
         [SerializeField] private TrackProvider trackProvider;
 
         private void OnValidate()
@@ -37,6 +39,7 @@ namespace KickinIt.Simulation.Game
             }, Lifetime.Singleton);
             
             builder.RegisterComponent(playerManager);
+            builder.RegisterComponent(playerRegistry);
             builder.RegisterComponent(trackProvider);
             
             builder.Register<InputCollector>(Lifetime.Singleton);

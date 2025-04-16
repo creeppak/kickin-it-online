@@ -12,5 +12,6 @@ namespace KickinIt.Simulation
         IPlayerSimulation GetPlayer(int index);
         // int PlayerCount { get; }
         string SessionCode { get; }
+        UniTask EnsureLocalPlayerInitialized();
     }
 }

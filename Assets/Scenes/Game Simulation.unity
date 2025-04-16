@@ -432,6 +432,7 @@ GameObject:
   - component: {fileID: 1046295987}
   - component: {fileID: 1046295986}
   - component: {fileID: 1046295985}
+  - component: {fileID: 1046295990}
   m_Layer: 0
   m_Name: '[M] Simulation Scope'
   m_TagString: Untagged
@@ -456,8 +457,8 @@ MonoBehaviour:
   autoRun: 0
   autoInjectGameObjects: []
   simulation: {fileID: 1046295988}
-  network: {fileID: 1046295986}
   playerManager: {fileID: 1046295985}
+  playerRegistry: {fileID: 1046295990}
   trackProvider: {fileID: 1514585182}
 --- !u!4 &1046295984
 Transform:
@@ -519,6 +520,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 1046295989}
   - {fileID: 1046295988}
+  - {fileID: 1046295990}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &1046295988
 MonoBehaviour:
@@ -542,6 +544,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e7a0ff7ed3db4be6b4b6c248ec42e009, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1046295990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046295982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd273b680ded4ccf825cdaeb89476f14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1106697674

@@ -40,9 +40,9 @@ namespace KickinIt.Simulation.Game
         public Observable<int> Countdown => _countdown;
         // public int PlayerCount => throw new NotImplementedException();
         public string SessionCode => _simulationArgs.sessionCode;
-
+        
         [Networked] private Trigger LastFiredTrigger { get; set; }
-        private Trigger _lastProcessedTrigger = Trigger.None;
+        private Trigger _lastSyncedTrigger = Trigger.None;
         
         private readonly ReactiveProperty<SimulationPhase> _phase = new(SimulationPhase.Inactive);
         private readonly BehaviorSubject<int> _countdown = new(CountdownSteps);
@@ -71,11 +71,11 @@ namespace KickinIt.Simulation.Game
             await _stateMachine.FireAsync(Trigger.ForceTerminate); // exit active state
         }
 
-        public override void FixedUpdateNetwork()
+        public override void Render()
         {
             SyncStateMachine();
         }
-        
+
         public async UniTask StartSimulation() => await _stateMachine.FireAsync(Trigger.StartSimulation);
         public async UniTask TerminateSimulation() => await _stateMachine.FireAsync(Trigger.ForceTerminate);
         
@@ -83,14 +83,22 @@ namespace KickinIt.Simulation.Game
         {
             throw new NotImplementedException();
         }
+        
+        public UniTask EnsureLocalPlayerInitialized()
+        {
+            return UniTask.WaitUntil(() => _playerManager.HasPlayer(Runner.LocalPlayer));
+        }
 
         private void SyncStateMachine()
         {
             if (Object.HasStateAuthority) return; // no sync on host
-            if (!Runner.IsForward) return;
-            if (_lastProcessedTrigger == LastFiredTrigger) return;
+            // if (!Runner.IsForward) return; // don't need as Render only called for forward?
+            if (_lastSyncedTrigger == LastFiredTrigger) return;
+            
+            _lastSyncedTrigger = LastFiredTrigger;
+            
+            if (LastFiredTrigger == Trigger.StartSimulation) return; // ignore, we want client to start simulation itself
 
-            _lastProcessedTrigger = LastFiredTrigger;
             _stateMachine.Fire(LastFiredTrigger);
         }
 
@@ -114,10 +122,12 @@ namespace KickinIt.Simulation.Game
                 .Permit(Trigger.StartCountdown, State.Countdown)
                 .OnEntry(() =>
                 {
+                    _playerManager.GetPlayer(Runner.LocalPlayer).SetReady(true);
+                    
                     if (!Object.HasStateAuthority) return;
                     
-                    _playerManager.PlayerCount
-                        .Where(count => count >= 2) // todo: make this configurable
+                    Observable.EveryUpdate()
+                        .Where(_ => _playerManager.PlayerCount >= 2 && _playerManager.AllPlayersReady)
                         .Take(1)
                         .Subscribe(_ => _stateMachine.Fire(Trigger.StartCountdown))
                         .AddTo(ref waitingForPlayersDisposables);

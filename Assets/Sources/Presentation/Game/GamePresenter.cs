@@ -65,7 +65,7 @@ namespace KickinIt.Presentation.Match
         {
             var sb = new StringBuilder();
                     
-            for (var i = 0; i < 6; i++)
+            for (var i = 0; i < 4; i++)
             {
                 sb.Append(UnityEngine.Random.Range(0, 10));
             }

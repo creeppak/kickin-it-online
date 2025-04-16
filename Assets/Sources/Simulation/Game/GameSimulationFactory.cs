@@ -90,6 +90,8 @@ namespace KickinIt.Simulation.Game
             await UniTask.WaitWhile(() => networkRunner.IsStarting);
             
             var simulation = simulationScope.Container.Resolve<IGameSimulation>();
+            
+            await simulation.EnsureLocalPlayerInitialized();
                 
             return simulation;
             

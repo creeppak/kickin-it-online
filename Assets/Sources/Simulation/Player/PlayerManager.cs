@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Fusion;
 using KickinIt.Simulation.Network;
 using R3;
@@ -11,19 +13,21 @@ namespace KickinIt.Simulation.Player
     internal class PlayerManager : MonoBehaviour
     {
         [SerializeField] private NetworkPrefabRef playerPrefabRef;
-
-        private readonly Dictionary<PlayerRef, NetworkObject> _playerObjects = new();
+        
+        private readonly ReactiveProperty<bool> _allPlayersReady = new(false);
         
         private NetworkRunner _networkRunner;
         private LifetimeScope _lifetimeScope;
-        
-        private ReactiveProperty<int> _playerCount { get; } = new(0);
-        
-        public Observable<int> PlayerCount => _playerCount; 
+        private PlayerRegistry _playerRegistry;
+
+        public int PlayerCount => _playerRegistry.PlayerCount;
+
+        public bool AllPlayersReady => _playerRegistry.CollectAllPlayers().All(simulation => simulation.IsReady);
 
         [Inject]
-        private void Construct(NetworkRunner networkRunner, LifetimeScope lifetimeScope)
+        private void Construct(NetworkRunner networkRunner, PlayerRegistry playerRegistry, LifetimeScope lifetimeScope)
         {
+            _playerRegistry = playerRegistry;
             _lifetimeScope = lifetimeScope;
             _networkRunner = networkRunner;
         }
@@ -47,23 +51,35 @@ namespace KickinIt.Simulation.Player
         {
             var playerObject = _networkRunner.Spawn(playerPrefabRef, inputAuthority: playerRef,
                 onBeforeSpawned: (runner, o) => OnBeforeSpawnedOnServer(runner, o, playerRef));
-            _playerObjects.Add(playerRef, playerObject);
             
-            _playerCount.Value = _playerObjects.Count;
+            _playerRegistry.RegisterPlayer(playerRef, playerObject);
+            _allPlayersReady.Value = false;
         }
 
         public void TerminatePlayer(PlayerRef playerRef)
         {
-            if (!_playerObjects.TryGetValue(playerRef, out var playerObject))
-            {
-                Debug.LogError("Tried despawning player object as part of termination procedure, but object was not found.");
-                return;
-            }
+            var playerObject = _playerRegistry.GetPlayer(playerRef).NetworkObject;
             
             _networkRunner.Despawn(playerObject); // this should trigger player scope disposal
-            _playerObjects.Remove(playerRef);
-            
-            _playerCount.Value = _playerObjects.Count;
+            _playerRegistry.UnregisterPlayer(playerRef);
+        }
+
+        public bool HasPlayer(PlayerRef playerRef)
+        {
+            return _playerRegistry.HasPlayer(playerRef);
+        }
+
+        public IPlayerSimulation GetPlayer(PlayerRef playerRef)
+        {
+            return _playerRegistry.GetPlayer(playerRef);
+        }
+
+        public void UnreadyAll()
+        {
+            foreach (var player in _playerRegistry.CollectAllPlayers())
+            {
+                player.SetReady(false);
+            }
         }
 
         private void OnBeforeSpawnedOnServer(NetworkRunner runner, NetworkObject obj, PlayerRef playerRef)

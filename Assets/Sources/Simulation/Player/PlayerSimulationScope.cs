@@ -10,8 +10,10 @@ namespace KickinIt.Simulation.Player
     internal class PlayerSimulationScope : LifetimeScope
     {
         [FormerlySerializedAs("network")] [SerializeField] private PlayerReplication replication;
+        [SerializeField] private NetworkObject networkObject;
         [SerializeField] private PlayerMovement movement;
         [SerializeField] private PlayerScore score;
+        [SerializeField] private PlayerReadinessSystem readinessSystem;
 
         private void OnValidate()
         {
@@ -24,9 +26,13 @@ namespace KickinIt.Simulation.Player
 
         protected override void Configure(IContainerBuilder builder)
         {
+            builder.Register<IPlayerSimulation, PlayerSimulation>(Lifetime.Singleton); // facade
+            
+            builder.RegisterComponent(networkObject);
             builder.RegisterComponent(replication);
             builder.RegisterComponent(movement);
             builder.RegisterComponent(score);
+            builder.RegisterComponent(readinessSystem);
             
             builder.Register(ResolvePlayerTrack, Lifetime.Singleton);
             
