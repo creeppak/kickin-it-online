@@ -58,7 +58,7 @@ namespace KickinIt.Simulation.Game
             else // client
             {
                 // we have to hack things a bit, because we don't have control over the replication process of Photon Fusion
-                var subscription = ReplicationEventBus<GameReplication>.ReplicatedOnClient
+                var subscription = ReplicationEvent<GameReplication>.ReplicatedOnClient
                     .Take(1)
                     .Subscribe(networkComponent =>
                     {

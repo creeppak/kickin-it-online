@@ -1,13 +1,14 @@
 ﻿using Fusion;
+using KickinIt.Simulation.Game;
 using KickinIt.Simulation.Network;
 
 namespace KickinIt.Simulation.Player
 {
-    internal class PlayerReplication : NetworkBehaviour
+    internal class PlayerReplication : NetworkBehaviour, IAfterSpawned
     {
-        public override void Spawned()
+        public void AfterSpawned() // using AfterSpawned as a dirty hack to execute this after GameReplication, todo: manage the execution order of such components
         {
-            ReplicationEventBus<PlayerReplication>.PushSpawned(this);
+            ReplicationEvent<PlayerReplication>.PushSpawned(this);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace KickinIt.Simulation.Game
     {
         public override void Spawned()
         {
-            ReplicationEventBus<GameReplication>.PushSpawned(this);
+            ReplicationEvent<GameReplication>.PushSpawned(this);
         }
     }
 }

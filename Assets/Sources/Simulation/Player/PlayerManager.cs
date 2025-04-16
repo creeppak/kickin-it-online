@@ -30,7 +30,7 @@ namespace KickinIt.Simulation.Player
 
         private void Awake()
         {
-            ReplicationEventBus<PlayerReplication>.ReplicatedOnClient
+            ReplicationEvent<PlayerReplication>.ReplicatedOnClient
                 .IgnoreOnErrorResume(Debug.LogException)
                 .Subscribe(OnPlayerSpawnedOnClient)
                 .AddTo(this);

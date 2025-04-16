@@ -1,10 +1,13 @@
-﻿using Fusion;
+﻿using System;
+using Fusion;
+using KickinIt.Simulation.Game;
+using KickinIt.Simulation.Player;
 using R3;
 using UnityEngine;
 
 namespace KickinIt.Simulation.Network
 {
-    public static class ReplicationEventBus<TNetworkComponent> where TNetworkComponent : NetworkBehaviour
+    public class ReplicationEvent<TNetworkComponent> where TNetworkComponent : NetworkBehaviour
     {
         private static readonly Subject<TNetworkComponent> _replicatedOnClientSubject = new();
         
