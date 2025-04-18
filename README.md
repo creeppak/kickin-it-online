@@ -40,6 +40,7 @@ For an overview of the game setup and architecture, please refer to the followin
 | Meta-Game   | `Presentation/Metagame/MetaGameScope.cs`     |
 | Game        | `Presentation/Game/GamePresentationScope.cs` |
 | Simulation  | `Simulation/Game/GameSimulationScope.cs`     |
+
 _You can find the source files in the `Assets/Sources` folder._
 
 ### Prerequisites
