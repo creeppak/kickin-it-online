@@ -6,6 +6,7 @@ This repository is a demonstration of a scalable multiplayer game architecture u
 
 ![Metagame Screenshot](Markdown/metagame.png)
 ![Match Screenshot](Markdown/match.png)
+![New arena WIP](Markdown/new-arena.png)
 
 ## Overview
 
@@ -31,10 +32,15 @@ The project leverages the following technologies:
 
 ### Starting Point
 
-For an overview of the game setup and architecture, please refer to the following files:
-- `Sources/Presentation/Game/GameScope.cs`
-- `Sources/Presentation/Metagame/MetaGameScope.cs`
-- `Sources/Presentation/Match/MatchScope.cs`
+For an overview of the game setup and architecture, please refer to the following source files:
+
+| Level       | Source File                                  |
+|-------------|----------------------------------------------|
+| Application | `Presentation/App/AppScope.cs`               |
+| Meta-Game   | `Presentation/Metagame/MetaGameScope.cs`     |
+| Game        | `Presentation/Game/GamePresentationScope.cs` |
+| Simulation  | `Simulation/Game/GameSimulationScope.cs`     |
+_You can find the source files in the `Assets/Sources` folder._
 
 ### Prerequisites
 

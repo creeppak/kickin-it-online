@@ -13,7 +13,7 @@ namespace KickinIt.Simulation.Game
     {
         [SerializeField] private GameSimulation simulation;
         [SerializeField] private PlayerManager playerManager;
-        [FormerlySerializedAs("playerRegistry")] [SerializeField] private PlayerRegistry playerRegistry;
+        [SerializeField] private PlayerRegistry playerRegistry;
         [SerializeField] private TrackProvider trackProvider;
 
         private void OnValidate()
@@ -30,13 +30,7 @@ namespace KickinIt.Simulation.Game
             builder.RegisterComponent(simulation)
                 .As<IGameSimulation>();
 
-            builder.Register(resolver =>
-            {
-                var runner = resolver.Resolve<NetworkRunner>();
-                var gameNetwork = runner.gameObject.AddComponent<GameNetwork>();
-                resolver.Inject(gameNetwork);
-                return gameNetwork;
-            }, Lifetime.Singleton);
+            builder.Register(ResolveGameNetwork, Lifetime.Singleton);
             
             builder.RegisterComponent(playerManager);
             builder.RegisterComponent(playerRegistry);
@@ -45,6 +39,14 @@ namespace KickinIt.Simulation.Game
             builder.Register<InputCollector>(Lifetime.Singleton);
 
             builder.Register<IInputWriter, SimpleMoveInputWriter>(Lifetime.Singleton);
+
+            GameNetwork ResolveGameNetwork(IObjectResolver resolver)
+            {
+                var runner = resolver.Resolve<NetworkRunner>();
+                var gameNetwork = runner.gameObject.AddComponent<GameNetwork>();
+                resolver.Inject(gameNetwork);
+                return gameNetwork;
+            }
         }
     }
 }
