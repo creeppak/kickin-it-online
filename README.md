@@ -5,8 +5,7 @@ This repository is a demonstration of a scalable multiplayer game architecture u
 **Please note:** The demo is still a work-in-progress and is not fully functional.
 
 ![Metagame Screenshot](Markdown/metagame.png)
-![Match Screenshot](Markdown/match.png)
-![New arena WIP](Markdown/new-arena.png)
+![New arena WIP](Markdown/lobby.gif)
 
 ## Overview
 
