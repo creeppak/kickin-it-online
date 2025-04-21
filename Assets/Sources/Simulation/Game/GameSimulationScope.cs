@@ -15,6 +15,7 @@ namespace KickinIt.Simulation.Game
         [SerializeField] private PlayerManager playerManager;
         [SerializeField] private PlayerRegistry playerRegistry;
         [SerializeField] private TrackProvider trackProvider;
+        [SerializeField] private KartInputWriter kartInputWriter;
 
         private void OnValidate()
         {
@@ -38,8 +39,8 @@ namespace KickinIt.Simulation.Game
             
             builder.Register<InputCollector>(Lifetime.Singleton);
 
-            builder.Register<IInputWriter, SimpleMoveInputWriter>(Lifetime.Singleton);
-
+            builder.RegisterComponent(kartInputWriter)
+                .As<IInputWriter>();
             GameNetwork ResolveGameNetwork(IObjectResolver resolver)
             {
                 var runner = resolver.Resolve<NetworkRunner>();

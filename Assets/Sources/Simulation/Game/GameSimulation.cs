@@ -6,7 +6,6 @@ using KickinIt.Simulation.Player;
 using R3;
 using Stateless;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using VContainer;
 
 namespace KickinIt.Simulation.Game
@@ -35,14 +34,6 @@ namespace KickinIt.Simulation.Game
         
         private const int CountdownSteps = 3;
         private const float CountdownStepDuration = 1f;
-
-        public Observable<SimulationPhase> Phase => _phase;
-        public Observable<int> Countdown => _countdown;
-        // public int PlayerCount => throw new NotImplementedException();
-        public string SessionCode => _simulationArgs.sessionCode;
-        
-        [Networked] private Trigger LastFiredTrigger { get; set; }
-        private Trigger _lastSyncedTrigger = Trigger.None;
         
         private readonly ReactiveProperty<SimulationPhase> _phase = new(SimulationPhase.Inactive);
         private readonly BehaviorSubject<int> _countdown = new(CountdownSteps);
@@ -51,6 +42,17 @@ namespace KickinIt.Simulation.Game
         private GameNetwork _network;
         private StateMachine<State, Trigger> _stateMachine;
         private PlayerManager _playerManager;
+        private IGameSimulation _gameSimulationImplementation;
+        
+        [Networked] private Trigger LastFiredTrigger { get; set; }
+        private Trigger _lastSyncedTrigger = Trigger.None;
+
+        public Observable<SimulationPhase> Phase => _phase;
+        public Observable<int> Countdown => _countdown;
+        public string SessionCode => _simulationArgs.sessionCode;
+
+        public Observable<Unit> PlayerJoined => _playerManager.PlayerJoined;
+        public Observable<Unit> PlayerLeft => _playerManager.PlayerLeft;
 
         [Inject]
         private void Configure(SimulationArgs simulationArgs, GameNetwork network, PlayerManager playerManager)
@@ -81,7 +83,9 @@ namespace KickinIt.Simulation.Game
         
         public IPlayerSimulation GetPlayer(int index)
         {
-            throw new NotImplementedException();
+            return _playerManager.TryGetPlayer(PlayerRef.FromIndex(index), out IPlayerSimulation playerSimulation) 
+                ? playerSimulation 
+                : null;
         }
         
         public UniTask EnsureLocalPlayerInitialized()

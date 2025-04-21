@@ -41,16 +41,12 @@ namespace KickinIt.Simulation.Game
 
         void INetworkRunnerCallbacks.OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
-            if (!_networkRunner.IsServer) return;
-            
-            _playerManager.InitializeNewPlayer(player);
+            _playerManager.OnPlayerJoined(player);
         }
 
         void INetworkRunnerCallbacks.OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-            if (!_networkRunner.IsServer) return;
-            
-            _playerManager.TerminatePlayer(player);
+            _playerManager.OnPlayerLeft(player);
         }
         
         void INetworkRunnerCallbacks.OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player){}

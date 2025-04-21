@@ -1,4 +1,5 @@
-﻿using Fusion;
+﻿using System;
+using Fusion;
 
 namespace KickinIt.Simulation.Input
 {

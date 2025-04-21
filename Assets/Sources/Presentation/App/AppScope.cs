@@ -3,6 +3,7 @@ using Fusion;
 using KickinIt.Presentation.BackgroundWorker;
 using KickinIt.Presentation.Game.GameStates;
 using KickinIt.Simulation.Network;
+using Sources.Common;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -16,6 +17,8 @@ namespace KickinIt.Presentation.Game
         
         protected override void Configure(IContainerBuilder builder)
         {
+            builder.Register<FancyNameProvider>(Lifetime.Singleton);
+            
             builder.Register<SimpleAppStateFactory>(Lifetime.Transient);
             builder.Register<SceneAppStateFactory>(Lifetime.Transient)
                 .AsSelf()

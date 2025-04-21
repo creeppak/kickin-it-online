@@ -8,5 +8,6 @@ namespace KickinIt.Simulation
         public NetworkObject NetworkObject { get; }
         public void SetReady(bool isReady);
         public bool IsReady { get; }
+        string PlayerName { get; }
     }
 }
