@@ -20,7 +20,6 @@ namespace KickinIt.Simulation.Game
         [Inject]
         private void Construct(NetworkRunner networkRunner, InputCollector inputCollector, PlayerManager playerManager)
         {
-            // _playerManagerFactory = playerManagerFactory;
             _playerManager = playerManager;
             _networkRunner = networkRunner;
             _inputCollector = inputCollector;
@@ -28,9 +27,10 @@ namespace KickinIt.Simulation.Game
         
         internal async UniTask ShutdownSession()
         {
-            var simulationScene = gameObject.scene;
+            // var sceneIndex = _networkRunner.SceneManager.GetSceneRef(gameObject).AsIndex;
+            await _networkRunner.UnloadScene(GameSimulationConstants.SimulationSceneName);
             await _networkRunner.Shutdown();
-            await SceneManager.UnloadSceneAsync(simulationScene);
+            // await SceneManager.UnloadSceneAsync(sceneIndex);
         }
 
         void INetworkRunnerCallbacks.OnInput(NetworkRunner runner, NetworkInput input)

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Fusion;
+using KickinIt.Simulation.Balls;
 using KickinIt.Simulation.Player;
 using R3;
 using Stateless;
@@ -19,6 +21,7 @@ namespace KickinIt.Simulation.Game
             WaitingForPlayers,
             Countdown,
             InProgress,
+            PostGoalDelay,
             Finished
         }
 
@@ -29,8 +32,13 @@ namespace KickinIt.Simulation.Game
             StartCountdown = 2,
             StartMatch = 3,
             EndMatch = 4,
-            ForceTerminate = 5
+            ForceTerminate = 5,
+            StartPostGoalDelay = 6,
+            ResumeMatch = 7,
+            TryAgain = 8,
         }
+
+        private DisposableBag _currentStateBag;
         
         private const int CountdownSteps = 3;
         private const float CountdownStepDuration = 1f;
@@ -40,23 +48,27 @@ namespace KickinIt.Simulation.Game
 
         private SimulationArgs _simulationArgs;
         private GameNetwork _network;
-        private StateMachine<State, Trigger> _stateMachine;
         private PlayerManager _playerManager;
-        private IGameSimulation _gameSimulationImplementation;
+        private BallSpawner _ballSpawner;
         
-        [Networked] private Trigger LastFiredTrigger { get; set; }
+        private StateMachine<State, Trigger> _stateMachine;
         private Trigger _lastSyncedTrigger = Trigger.None;
+        
+        [SerializeField] private float postGoalDelay = 3f;
+        // ReSharper disable once NotAccessedField.Local
+        [SerializeField] [Sirenix.OdinInspector.ReadOnly] private State stateDebug;
+
+        [Networked] private Trigger LastFiredTrigger { get; set; }
 
         public Observable<SimulationPhase> Phase => _phase;
         public Observable<int> Countdown => _countdown;
         public string SessionCode => _simulationArgs.sessionCode;
 
-        public Observable<Unit> PlayerJoined => _playerManager.PlayerJoined;
-        public Observable<Unit> PlayerLeft => _playerManager.PlayerLeft;
-
         [Inject]
-        private void Configure(SimulationArgs simulationArgs, GameNetwork network, PlayerManager playerManager)
+        private void Configure(SimulationArgs simulationArgs, GameNetwork network, PlayerManager playerManager,
+            BallSpawner ballSpawner)
         {
+            _ballSpawner = ballSpawner;
             _playerManager = playerManager;
             _simulationArgs = simulationArgs;
             _network = network;
@@ -81,7 +93,7 @@ namespace KickinIt.Simulation.Game
         public async UniTask StartSimulation() => await _stateMachine.FireAsync(Trigger.StartSimulation);
         public async UniTask TerminateSimulation() => await _stateMachine.FireAsync(Trigger.ForceTerminate);
         
-        public IPlayerSimulation GetPlayer(int index)
+        public IPlayer GetPlayer(int index)
         {
             return _playerManager.TryGetPlayer(PlayerRef.FromIndex(index), out IPlayerSimulation playerSimulation) 
                 ? playerSimulation 
@@ -91,19 +103,6 @@ namespace KickinIt.Simulation.Game
         public UniTask EnsureLocalPlayerInitialized()
         {
             return UniTask.WaitUntil(() => _playerManager.HasPlayer(Runner.LocalPlayer));
-        }
-
-        private void SyncStateMachine()
-        {
-            if (Object.HasStateAuthority) return; // no sync on host
-            // if (!Runner.IsForward) return; // don't need as Render only called for forward?
-            if (_lastSyncedTrigger == LastFiredTrigger) return;
-            
-            _lastSyncedTrigger = LastFiredTrigger;
-            
-            if (LastFiredTrigger == Trigger.StartSimulation) return; // ignore, we want client to start simulation itself
-
-            _stateMachine.Fire(LastFiredTrigger);
         }
 
         private void ConfigureStateMachine()
@@ -120,25 +119,31 @@ namespace KickinIt.Simulation.Game
                 .Permit(Trigger.ForceTerminate, State.Inactive)
                 .OnExitAsync(TerminateSimulationInternal);
 
-            var waitingForPlayersDisposables = new DisposableBag();
             _stateMachine.Configure(State.WaitingForPlayers)
                 .SubstateOf(State.Active)
                 .Permit(Trigger.StartCountdown, State.Countdown)
                 .OnEntry(() =>
                 {
+                    // Automatically mark player as ready
                     _playerManager.GetPlayer(Runner.LocalPlayer).SetReady(true);
-                    
+
                     if (!Object.HasStateAuthority) return;
-                    
+
+                    // Listen for all players to get ready
                     Observable.EveryUpdate()
-                        .Where(_ => _playerManager.PlayerCount >= 2 && _playerManager.AllPlayersReady)
+                        .Where(AllPlayersReady)
                         .Take(1)
                         .Subscribe(_ => _stateMachine.Fire(Trigger.StartCountdown))
-                        .AddTo(ref waitingForPlayersDisposables);
-                })
-                .OnExit(() => waitingForPlayersDisposables.Dispose());
+                        .AddTo(ref _currentStateBag);
+                    
+                    bool AllPlayersReady(Unit _)
+                    {
+                        if (_simulationArgs.singlePlayer) { return true; }
 
-            var countdownDisposables = new DisposableBag();
+                        return _playerManager.PlayerCount >= 2 && _playerManager.AllPlayersReady;
+                    }
+                });
+
             _stateMachine.Configure(State.Countdown)
                 .SubstateOf(State.Active)
                 .Permit(Trigger.StartMatch, State.InProgress)
@@ -157,22 +162,98 @@ namespace KickinIt.Simulation.Game
 
                                 _stateMachine.Fire(Trigger.StartMatch);
                             })
-                        .AddTo(ref countdownDisposables);
-                })
-                .OnExit(() => countdownDisposables.Dispose());
+                        .AddTo(ref _currentStateBag);
+                });
 
             _stateMachine.Configure(State.InProgress)
                 .SubstateOf(State.Active)
+                .Permit(Trigger.StartPostGoalDelay, State.PostGoalDelay)
                 .Permit(Trigger.EndMatch, State.Finished)
                 .OnEntry(() =>
                 {
-                    Debug.Log("Match has started!");
-                    // todo enable ball spawner
+                    if (!Object.HasStateAuthority) return;
+                    
+                    _ballSpawner.SpawnBall();
+
+                    var players = _playerManager.CollectAllPlayers();
+
+                    foreach (var player in players)
+                    {
+                        player.SetImmortal(false); // allow players to receive damage
+                    }
+
+                    players.Select(player => player.OnHealthDown)
+                        .Merge()
+                        .Subscribe(player =>
+                        {
+                            _stateMachine.Fire(Trigger.StartPostGoalDelay);
+                        })
+                        .AddTo(ref _currentStateBag);
+
+                    players.Select(player => player.OnHealthOver)
+                        .Merge()
+                        .Subscribe(_ =>
+                        {
+                            var playersAlive = players.Count(player => player.HealthPoints > 0);
+
+                            if (playersAlive > 1) return; // ignore
+                            
+                            _stateMachine.Fire(Trigger.EndMatch);
+                        })
+                        .AddTo(ref _currentStateBag);
                 })
                 .OnExit(() =>
                 {
-                    // todo disable ball spawner
+                    var players = _playerManager.CollectAllPlayers();
+
+                    foreach (var player in players)
+                    {
+                        player.SetImmortal(true); // disable damage till the next ball spawn
+                    }
+                    
+                    _ballSpawner.TryDespawnBall();
                 });
+
+            _stateMachine.Configure(State.PostGoalDelay)
+                .SubstateOf(State.Active)
+                .Permit(Trigger.ResumeMatch, State.InProgress)
+                .OnEntry(() =>
+                {
+                    if (!Object.HasStateAuthority) return;
+
+                    Observable.Timer(TimeSpan.FromSeconds(postGoalDelay))
+                        .Subscribe(_ => _stateMachine.Fire(Trigger.ResumeMatch))
+                        .AddTo(ref _currentStateBag);
+                });
+
+            _stateMachine.Configure(State.Finished)
+                .SubstateOf(State.Active)
+                .Permit(Trigger.TryAgain, State.WaitingForPlayers)
+                .OnEntry(() =>
+                {
+                    // todo: keep winner as result for application to read
+                })
+                .OnExit(() =>
+                {
+                    if (!Object.HasStateAuthority) return;
+
+                    foreach (var playerSimulation in _playerManager.CollectAllPlayers())
+                    {
+                        playerSimulation.ResetPlayer();
+                    }
+                });
+        }
+
+        private void SyncStateMachine()
+        {
+            if (Object.HasStateAuthority) return; // no sync on host
+            if (_lastSyncedTrigger == LastFiredTrigger) return;
+            
+            _lastSyncedTrigger = LastFiredTrigger;
+            
+            if (LastFiredTrigger == Trigger.StartSimulation) return; // ignore, we want client to start simulation itself
+
+            _stateMachine.Fire(LastFiredTrigger);
         }
 
         private async Task TerminateSimulationInternal()
@@ -182,11 +263,18 @@ namespace KickinIt.Simulation.Game
 
         private void OnStateMachineTransitioning(StateMachine<State, Trigger>.Transition obj)
         {
+            _currentStateBag.Dispose(); // clear previous subscriptions
+            _currentStateBag = new DisposableBag(); // reset state for new state
+            
+            if (obj.Destination == State.Inactive) return; // the simulation was terminated, networked state won't get synchronized anymore
+            
             LastFiredTrigger = obj.Trigger; // sync network
         }
 
         private void OnStateMachineTransitionComplete(StateMachine<State, Trigger>.Transition obj)
         {
+            stateDebug = obj.Destination;
+            
             switch (obj.Destination)
             {
                 case State.Inactive:

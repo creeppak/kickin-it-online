@@ -1,5 +1,6 @@
 ﻿using System;
 using KickinIt.View;
+using Sources.Common;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -28,6 +29,8 @@ namespace KickinIt.Presentation.Screens
             builder.RegisterEntryPoint(resolver => resolver.Resolve<GameScreenPresenter>(), Lifetime.Singleton);
             
             builder.RegisterEntryPointExceptionHandler(Debug.LogException);
+            
+            builder.RunMonoInstallers(gameObject); // run screen-specific installers
         }
     }
 }

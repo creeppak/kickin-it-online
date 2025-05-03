@@ -1,6 +1,8 @@
 ﻿using Fusion;
+using KickinIt.Simulation.Balls;
 using KickinIt.Simulation.Input;
 using KickinIt.Simulation.Player;
+using KickinIt.Simulation.Synchronization;
 using KickinIt.Simulation.Track;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -16,6 +18,7 @@ namespace KickinIt.Simulation.Game
         [SerializeField] private PlayerRegistry playerRegistry;
         [SerializeField] private TrackProvider trackProvider;
         [SerializeField] private KartInputWriter kartInputWriter;
+        [SerializeField] private BallSpawner ballSpawner;
 
         private void OnValidate()
         {
@@ -33,14 +36,23 @@ namespace KickinIt.Simulation.Game
 
             builder.Register(ResolveGameNetwork, Lifetime.Singleton);
             
-            builder.RegisterComponent(playerManager);
+            builder.RegisterComponent(playerManager)
+                .AsSelf()
+                .As<IInitializable>();
+            
             builder.RegisterComponent(playerRegistry);
             builder.RegisterComponent(trackProvider);
+            builder.RegisterComponent(ballSpawner);
+            builder.Register(_ => gameObject.scene.GetPhysicsScene(), Lifetime.Singleton);
             
             builder.Register<InputCollector>(Lifetime.Singleton);
 
             builder.RegisterComponent(kartInputWriter)
                 .As<IInputWriter>();
+
+            builder.RegisterEntryPoint<ScopeInitializationManager>();
+            
+            builder.RegisterEntryPointExceptionHandler(Debug.LogException);
             GameNetwork ResolveGameNetwork(IObjectResolver resolver)
             {
                 var runner = resolver.Resolve<NetworkRunner>();

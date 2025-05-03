@@ -15,6 +15,7 @@ namespace KickinIt.Presentation.Metagame
     {
         [SerializeField] private Button hostButton;
         [SerializeField] private Button joinButton;
+        [SerializeField] private Button practiceButton;
         
         private IScreenManager _screenManager;
         private IAppStateManager _appStateManager;
@@ -31,11 +32,12 @@ namespace KickinIt.Presentation.Metagame
             hostButton.OnClickAsObservable()
                 .SelectAwait(async (_, _) =>
                 {
-                    // network ready, change state to simulation
-                    await _appStateManager.ChangeState(AppStateId.Simulation, new GameStartArgs
+                    var gameStartArgs = new GameStartArgs
                     {
                         host = true
-                    });
+                    };
+
+                    await _appStateManager.ChangeState(AppStateId.Simulation, gameStartArgs);
                     return Unit.Default;
                 }, AwaitOperation.Drop)
                 .IgnoreOnErrorResume()
@@ -48,6 +50,21 @@ namespace KickinIt.Presentation.Metagame
                     await _screenManager.ChangeScreen(ScreenId.JoinMatchScreen);
                     return Unit.Default;
                 }, AwaitOperation.Drop)
+                .Subscribe()
+                .AddTo(this);
+            
+            practiceButton.OnClickAsObservable()
+                .SelectAwait(async (_, _) =>
+                {
+                    var gameStartArgs = new GameStartArgs
+                    {
+                        singlePlayer = true
+                    };
+
+                    await _appStateManager.ChangeState(AppStateId.Simulation, gameStartArgs);
+                    return Unit.Default;
+                }, AwaitOperation.Drop)
+                .IgnoreOnErrorResume()
                 .Subscribe()
                 .AddTo(this);
         }

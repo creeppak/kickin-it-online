@@ -3,11 +3,15 @@ using R3;
 
 namespace KickinIt.Simulation
 {
-    public interface IPlayerSimulation
+    internal interface IPlayerSimulation : IPlayer
     {
+        public PlayerRef PlayerRef { get; }
         public NetworkObject NetworkObject { get; }
-        public void SetReady(bool isReady);
-        public bool IsReady { get; }
-        string PlayerName { get; }
+
+        public Observable<IPlayerSimulation> OnHealthDown { get; }
+        public new Observable<IPlayerSimulation> OnHealthOver { get; }
+
+        void ResetPlayer();
+        void SetImmortal(bool immortal);
     }
 }

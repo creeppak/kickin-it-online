@@ -1,13 +1,14 @@
-﻿using Fusion;
+﻿using System;
+using Fusion;
 using KickinIt.Simulation.Input;
 using UnityEngine;
-using UnityEngine.Serialization;
 using VContainer;
 
 namespace KickinIt.Simulation.Player
 {
     internal class PlayerMovement : NetworkBehaviour
     {
+        [SerializeField] private new Rigidbody rigidbody;
         [SerializeField] private float baseSpeed = 16f;
         [SerializeField] private float inputThreshold = 0.1f;
         [SerializeField] private float attackTime = 1f / 6f;
@@ -18,6 +19,7 @@ namespace KickinIt.Simulation.Player
         [SerializeField] private float stopThreshold = 0.1f;
 
         private Track.PlayerTrack _track;
+        private Transform _transform;
         
         [Networked] private float X { get; set; }
         [Networked] private float Velocity { get; set; }
@@ -26,10 +28,16 @@ namespace KickinIt.Simulation.Player
         
         private float InputPhaseTime => Runner.SimulationTime - InputPhaseStartTime;
 
+        private void OnValidate()
+        {
+            if (!rigidbody) rigidbody = GetComponent<Rigidbody>();
+        }
+
         [Inject]
         private void Construct(Track.PlayerTrack track)
         {
             _track = track;
+            _transform = transform;
         }
 
         public override void FixedUpdateNetwork()
@@ -77,6 +85,8 @@ namespace KickinIt.Simulation.Player
 
             X += Velocity * Runner.DeltaTime;
             X = _track.ClampPosition(X);
+            
+            UpdatePosition3D();
 
             void ResetInputPhaseTime()
             {
@@ -87,8 +97,21 @@ namespace KickinIt.Simulation.Player
         public override void Render()
         {
             // update 3D
-            transform.position = _track.GetWorldPosition(X);
-            transform.rotation = _track.GetRotation(X);
+            UpdatePosition3D();
+        }
+
+        private void UpdatePosition3D()
+        {
+            if (Runner.IsServer)
+            {
+                rigidbody.position = _track.GetWorldPosition(X);
+                rigidbody.rotation = _track.GetRotation(X);
+            }
+            else
+            {
+                _transform.position = _track.GetWorldPosition(X);
+                _transform.rotation = _track.GetRotation(X);
+            }
         }
     }
 }

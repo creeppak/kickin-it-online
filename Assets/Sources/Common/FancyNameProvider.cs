@@ -2,24 +2,18 @@
 {
     public class FancyNameProvider
     {
-        private static readonly string[] FancyNames =
+        private static readonly string[] FancyNames = new[]
         {
             "Gordon Freeman",
             "Duke Nukem",
             "Lara Croft",
-            "Samus Aran",
+            "Mario",
             "Link",
-            "Master Chief",
-            "Cloud Strife",
-            "Geralt of Rivia",
-            "Kratos",
-            "Solid Snake"
         };
 
         public string GetName(int index)
         {
             index %= FancyNames.Length;
-            
             return FancyNames[index];
         }
     }

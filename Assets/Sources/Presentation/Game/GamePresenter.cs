@@ -46,6 +46,7 @@ namespace KickinIt.Presentation.Match
                 return new SimulationArgs
                 {
                     host = _gameStartArgs.host,
+                    singlePlayer = _gameStartArgs.singlePlayer,
                     sessionCode = _sessionCode,
                 };
             }

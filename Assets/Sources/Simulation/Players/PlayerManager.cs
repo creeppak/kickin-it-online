@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Fusion;
 using KickinIt.Simulation.Network;
+using KickinIt.Simulation.Synchronization;
 using R3;
 using UnityEngine;
 using VContainer;
@@ -10,7 +11,7 @@ using VContainer.Unity;
 
 namespace KickinIt.Simulation.Player
 {
-    internal class PlayerManager : MonoBehaviour
+    internal class PlayerManager : MonoBehaviour, IInitializable
     {
         [SerializeField] private NetworkPrefabRef playerPrefabRef;
         
@@ -21,6 +22,7 @@ namespace KickinIt.Simulation.Player
         private NetworkRunner _networkRunner;
         private LifetimeScope _lifetimeScope;
         private PlayerRegistry _playerRegistry;
+        private NetworkBindingService _networkBindingService;
 
         public int PlayerCount => _playerRegistry.PlayerCount;
 
@@ -30,26 +32,27 @@ namespace KickinIt.Simulation.Player
         public Observable<Unit> PlayerLeft => _onPlayerLeft;
 
         [Inject]
-        private void Construct(NetworkRunner networkRunner, PlayerRegistry playerRegistry, LifetimeScope lifetimeScope)
+        private void Construct(NetworkRunner networkRunner, PlayerRegistry playerRegistry, LifetimeScope lifetimeScope, NetworkBindingService networkBindingService)
         {
+            _networkBindingService = networkBindingService;
             _playerRegistry = playerRegistry;
             _lifetimeScope = lifetimeScope;
             _networkRunner = networkRunner;
         }
 
-        private void Awake()
+        public void Initialize()
         {
-            ReplicationEvent<PlayerReplication>.ReplicatedOnClient
+            _networkBindingService.Track<PlayerNetworkBinder>()
                 .IgnoreOnErrorResume(Debug.LogException)
                 .Subscribe(OnPlayerSpawnedOnClient)
                 .AddTo(this);
         }
 
-        private void OnPlayerSpawnedOnClient(PlayerReplication replicationComponent)
+        private void OnPlayerSpawnedOnClient(PlayerNetworkBinder component)
         {
-            if (replicationComponent.Runner != _networkRunner) return;
+            if (_networkRunner.IsServer) return; // ignore for now
             
-            BuildPlayerScope(replicationComponent.Object, replicationComponent.Object.InputAuthority);
+            BuildPlayerScope(component.Object, component.Object.InputAuthority);
         }
 
         public bool HasPlayer(PlayerRef playerRef)
@@ -60,6 +63,9 @@ namespace KickinIt.Simulation.Player
 
         public IPlayerSimulation GetPlayer(PlayerRef playerRef)
             => _playerRegistry.GetPlayer(playerRef);
+
+        public List<IPlayerSimulation> CollectAllPlayers() 
+            => _playerRegistry.CollectAllPlayers();
 
         public void UnreadyAll()
         {
@@ -106,19 +112,25 @@ namespace KickinIt.Simulation.Player
             _playerRegistry.UnregisterPlayer(playerRef);
         }
 
-        private void BuildPlayerScope(NetworkObject obj, PlayerRef playerRef)
+        private PlayerSimulationScope BuildPlayerScope(NetworkObject obj, PlayerRef playerRef)
         {
             using (LifetimeScope.EnqueueParent(_lifetimeScope))
             using (LifetimeScope.Enqueue(builder => builder.RegisterInstance(playerRef)))
             {
                 var scope = obj.GetComponent<PlayerSimulationScope>();
                 scope.Build();
+                return scope;
             }
         }
 
         private void OnBeforeSpawnedOnServer(NetworkObject obj, PlayerRef playerRef)
         {
-            BuildPlayerScope(obj, playerRef);
+            // Build Player Scope
+            var scope = BuildPlayerScope(obj, playerRef);
+            
+            // Initialize Player Simulation
+            var playerSimulation = scope.Container.Resolve<IPlayerSimulation>();
+            playerSimulation.ResetPlayer();
         }
     }
 }

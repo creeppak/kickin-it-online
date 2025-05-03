@@ -3,7 +3,9 @@ using Cysharp.Threading.Tasks;
 using Fusion;
 using KickinIt.Simulation.Network;
 using KickinIt.Simulation.Player;
+using KickinIt.Simulation.Synchronization;
 using R3;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer;
 using VContainer.Unity;
@@ -14,31 +16,36 @@ namespace KickinIt.Simulation.Game
     {
         private readonly LifetimeScope _scope;
         private readonly INetworkRunnerContainer _networkRunnerContainer;
+        private readonly NetworkBindingService _bindingService;
 
-        public GameSimulationFactory(LifetimeScope scope, INetworkRunnerContainer networkRunnerContainer)
+        public GameSimulationFactory(LifetimeScope scope, INetworkRunnerContainer networkRunnerContainer, NetworkBindingService bindingService)
         {
+            _bindingService = bindingService;
             _networkRunnerContainer = networkRunnerContainer;
             _scope = scope;
         }
 
         public async UniTask<IGameSimulation> Create(SimulationArgs args)
         {
-            const string simulationSceneName = "Game Simulation"; // using single scene for now
-            
             var networkRunner = _networkRunnerContainer.InitializeNew();
             networkRunner.ProvideInput = true; // only host and client modes are supported for now, both provide input
+            
+            _bindingService.Attach(networkRunner.GetComponent<EarlyNetworkUpdateHook>());
+            
             var sceneManager = networkRunner.gameObject.AddComponent<NetworkSceneManagerDefault>();
-            var sceneRef = sceneManager.GetSceneRef(simulationSceneName);
+            var sceneRef = sceneManager.GetSceneRef(GameSimulationConstants.SimulationSceneName);
             GameSimulationScope simulationScope = null;
             
-            if (args.host) // host
+            // todo: merge clients and host di binding logic
+            
+            if (args.host || args.singlePlayer) // host
             {
                 var sceneInfo = new NetworkSceneInfo();
                 sceneInfo.AddSceneRef(sceneRef, LoadSceneMode.Additive, LocalPhysicsMode.Physics3D, true);
                 
                 var result = await networkRunner.StartGame(new StartGameArgs
                 {
-                    GameMode = GameMode.Host,
+                    GameMode = args.singlePlayer ? GameMode.Single : GameMode.Host,
                     SessionName = args.sessionCode,
                     Scene = sceneInfo,
                     SceneManager = sceneManager
@@ -53,12 +60,12 @@ namespace KickinIt.Simulation.Game
                 await UniTask.WaitUntil(() => SceneManager.GetSceneByBuildIndex(sceneRef.AsIndex).isLoaded); // networkRunner.StartGame returns before the scene is actually loaded
                 
                 var loadedScene = SceneManager.GetSceneByBuildIndex(sceneRef.AsIndex);
-                simulationScope = RegisterSimulationScope(loadedScene);
+                simulationScope = RegisterSimulationScope(loadedScene); 
             }
             else // client
             {
                 // we have to hack things a bit, because we don't have control over the replication process of Photon Fusion
-                var subscription = ReplicationEvent<GameReplication>.ReplicatedOnClient
+                var subscription = _bindingService.Track<GameSimulationNetworkBinder>()
                     .Take(1)
                     .Subscribe(networkComponent =>
                     {
