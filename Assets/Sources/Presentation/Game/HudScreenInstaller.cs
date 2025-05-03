@@ -9,8 +9,6 @@ public sealed class HudScreenInstaller : MonoInstaller
 {
     public override void Install(IContainerBuilder builder)
     {
-        Debug.Log("HUDScreenInstaller install");
-        
         builder.RegisterFactory<IPlayer, HudPlayerPresenter, RectTransform, HudPlayerPresenter>(
             resolver =>
                 (player, prefab, container) => BuildPlayerHUD(resolver, player, prefab, container),

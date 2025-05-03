@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Fusion;
-using KickinIt.Simulation.Network;
+using KickinIt.Simulation.Game;
 using KickinIt.Simulation.Synchronization;
 using R3;
 using UnityEngine;
@@ -11,7 +11,7 @@ using VContainer.Unity;
 
 namespace KickinIt.Simulation.Player
 {
-    internal class PlayerManager : MonoBehaviour, IInitializable
+    internal class PlayerManager : MonoBehaviour, IGameInitializable
     {
         [SerializeField] private NetworkPrefabRef playerPrefabRef;
         

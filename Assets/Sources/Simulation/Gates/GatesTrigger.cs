@@ -9,6 +9,7 @@ namespace KickinIt.Simulation.Gates
     {
         [SerializeField] private new BoxCollider collider;
         [SerializeField] private LayerMask ballMask;
+        [SerializeField] private Color gizmoColor = Color.red;
         
         private readonly Collider[] _overlapBuffer = new Collider[8];
         private readonly Subject<Unit> _onGoal = new();
@@ -41,6 +42,16 @@ namespace KickinIt.Simulation.Gates
 
         private void OnDrawGizmos()
         {
+            DrawGizmos(gizmoColor / 2);
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            DrawGizmos(gizmoColor);
+        }
+
+        private void DrawGizmos(Color color)
+        {
             if (collider == null) return;
             
             if (_colliderTransform == null)
@@ -53,7 +64,7 @@ namespace KickinIt.Simulation.Gates
                 _cubeMesh = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
             }
             
-            Gizmos.color = Color.red;
+            Gizmos.color = color;
             
             var center = _colliderTransform.TransformPoint(collider.center);
             var rotation = _colliderTransform.rotation;

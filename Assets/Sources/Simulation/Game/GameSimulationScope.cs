@@ -36,10 +36,7 @@ namespace KickinIt.Simulation.Game
 
             builder.Register(ResolveGameNetwork, Lifetime.Singleton);
             
-            builder.RegisterComponent(playerManager)
-                .AsSelf()
-                .As<IInitializable>();
-            
+            builder.RegisterComponent(playerManager).AsImplementedInterfaces().AsSelf();
             builder.RegisterComponent(playerRegistry);
             builder.RegisterComponent(trackProvider);
             builder.RegisterComponent(ballSpawner);
@@ -50,7 +47,7 @@ namespace KickinIt.Simulation.Game
             builder.RegisterComponent(kartInputWriter)
                 .As<IInputWriter>();
 
-            builder.RegisterEntryPoint<ScopeInitializationManager>();
+            builder.RegisterEntryPoint<NetworkedInitializationManager<IGameInitializable>>();
             
             builder.RegisterEntryPointExceptionHandler(Debug.LogException);
             GameNetwork ResolveGameNetwork(IObjectResolver resolver)

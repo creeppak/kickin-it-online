@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using KickinIt.Simulation.Players;
 using KickinIt.Simulation.Synchronization;
 using KickinIt.Simulation.Track;
 using UnityEngine;
@@ -30,9 +31,7 @@ namespace KickinIt.Simulation.Player
             
             builder.RegisterComponent(networkObject);
             builder.RegisterComponent(movement);
-            builder.RegisterComponent(health)
-                .As<IInitializable>()
-                .AsSelf();
+            builder.RegisterComponent(health).AsImplementedInterfaces().AsSelf();
             builder.RegisterComponent(readinessSystem);
             builder.RegisterComponent(camera);
             
@@ -41,7 +40,7 @@ namespace KickinIt.Simulation.Player
             builder.UseEntryPoints(pointsBuilder =>
             {
                 pointsBuilder.Add<PlayerSimulationBoot>();
-                pointsBuilder.Add<ScopeInitializationManager>();
+                pointsBuilder.Add<NetworkedInitializationManager<IPlayerInitializable>>();
             });
             
             builder.RegisterEntryPointExceptionHandler(Debug.LogException);

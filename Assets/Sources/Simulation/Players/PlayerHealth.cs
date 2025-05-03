@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using KickinIt.Simulation.Players;
 using KickinIt.Simulation.Synchronization;
 using KickinIt.Simulation.Track;
 using R3;
@@ -8,7 +9,7 @@ using VContainer.Unity;
 
 namespace KickinIt.Simulation.Player
 {
-    internal class PlayerHealth : NetworkBehaviour, IInitializable
+    internal class PlayerHealth : NetworkBehaviour, IPlayerInitializable
     {
         [SerializeField] private int startHealth = 5;
         
