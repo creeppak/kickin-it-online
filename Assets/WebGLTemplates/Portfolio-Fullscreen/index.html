@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Kicking It [Demo]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <style>
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      body {
+        background-color: black;
+      }
+
+      #unity-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+      }
+
+      #unity-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .progress {
+        width: 20%;
+        height: 3px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgb(26, 26, 26);
+      }
+
+      #unity-loading-progress-bar {
+        background-color: white;
+      }
+
+      #rotate-hint {
+        display: none; /* Hidden by default */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 28pt;
+        text-align: center;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 20px;
+        border-radius: 10px;
+        width: 80%;
+        z-index: 10; /* Ensure it's above the canvas */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* 🔹 Icon Styling */
+      #rotate-hint i {
+        font-size: 50pt;
+        display: block; /* Ensures proper rendering */
+      }
+      
+      .mobile-hint {
+        color: #a9a9a9;
+        font-size: 24pt;
+      }
+    </style>
+  </head>
+  <body style="text-align: center; padding: 0; border: 0; margin: 0;">
+    <div id="unity-container" style="width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;">
+      <canvas id="unity-canvas" tabindex="-1"  style="width: 100%; height: 100%; margin: 0; padding: 0;"></canvas>
+      <div class="progress" id="unity-loading-progress">
+        <div class="progress-bar" id="unity-loading-progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+    </div>
+    <div id="rotate-hint">
+      <i class="bi bi-phone-landscape"></i>
+      <p>Please use landscape mode</p>
+      <p class="mobile-hint">Full mobile support coming soon<br/>Best viewed on desktop</p>
+    </div>
+    <script>
+      const progressBar = document.getElementById('unity-loading-progress-bar');
+      const progressBarContainer = document.getElementById('unity-loading-progress');
+      const unityContainer = document.getElementById('unity-container');
+      const rotateHint = document.getElementById('rotate-hint');
+
+      function setProgress(progress){
+        if(progressBar){
+          progressBar.style.width = progress + '%';
+          progressBar.setAttribute('aria-valuenow', progress);
+        }
+      }
+
+      function hideProgress(){
+        if (progressBarContainer){
+          progressBarContainer.style.display = "none";
+        }
+      }
+      
+      function checkOrientation() {
+        if (window.innerHeight > window.innerWidth) {
+          // Portrait Mode
+          unityContainer.style.display = "none";  // Hide Unity canvas
+          rotateHint.style.display = "block"; // Show hint
+        } else {
+          // Landscape Mode
+          unityContainer.style.display = "block"; // Show Unity canvas
+          rotateHint.style.display = "none";  // Hide hint
+        }
+      }
+
+      // Check orientation when page loads
+      checkOrientation();
+
+      // Listen for screen orientation changes
+      window.addEventListener("resize", checkOrientation);
+      window.addEventListener("orientationchange", checkOrientation);
+    </script>
+    <script src="Build/{{{ LOADER_FILENAME }}}"></script>
+    <script>      
+      const config = {
+        arguments: [],
+        dataUrl: "Build/{{{ DATA_FILENAME }}}",
+        frameworkUrl: "Build/{{{ FRAMEWORK_FILENAME }}}",
+        #if USE_THREADS
+        workerUrl: "Build/{{{ WORKER_FILENAME }}}",
+        #endif
+        #if USE_WASM
+        codeUrl: "Build/{{{ CODE_FILENAME }}}",
+        #endif
+        #if SYMBOLS_FILENAME
+        symbolsUrl: "Build/{{{ SYMBOLS_FILENAME }}}",
+        #endif
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+      productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+      productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+      // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
+      // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
+      };
+
+      createUnityInstance(document.querySelector("#unity-canvas"), config, (progress) => {
+        console.log("Progress: " + progress);
+        setProgress(progress * 100); // loading
+      }).then((unityInstance) => {
+        hideProgress(); // loaded
+      }).catch((message) => {
+        alert(message);
+      });
+    </script>
+  </body>
+</html>

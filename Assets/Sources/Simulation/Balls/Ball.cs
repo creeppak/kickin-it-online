@@ -15,6 +15,11 @@ namespace KickinIt.Simulation.Balls
         
         [Networked] private float MaxSpeed { get; set; }
 
+        public override void Spawned() // use INetworkInitializable if you need dependencies
+        {
+            Runner.SetIsSimulated(Object, true);
+        }
+
         public void InitializeOnServer(Vector3 direction)
         {
             MaxSpeed = startMaxSpeed;

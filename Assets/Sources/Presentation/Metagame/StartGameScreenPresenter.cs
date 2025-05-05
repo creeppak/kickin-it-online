@@ -1,9 +1,6 @@
-﻿using System;
-using Fusion;
-using KickinIt.Presentation.Game.GameStates;
+﻿using KickinIt.Presentation.Game.GameStates;
 using KickinIt.Presentation.Match;
 using KickinIt.Presentation.Screens;
-using KickinIt.Simulation.Network;
 using R3;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,6 +26,8 @@ namespace KickinIt.Presentation.Metagame
 
         protected override void OnScreenLoaded()
         {
+            hostButton.interactable = Application.platform != RuntimePlatform.WebGLPlayer; // hosting is disabled for WebGL
+            
             hostButton.OnClickAsObservable()
                 .SelectAwait(async (_, _) =>
                 {
