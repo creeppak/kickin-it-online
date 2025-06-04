@@ -79,3 +79,7 @@ crashlytics-build.properties
 # Hide old reference files not related to public demo
 /[Aa]ssets/Sources/OldReference.meta
 /[Aa]ssets/Sources/OldReference/*
+
+# Hide Nuget Packages
+/[Aa]ssets/Packages.meta
+/[Aa]ssets/Packages/*
