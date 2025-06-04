@@ -26,6 +26,7 @@ The project leverages the following technologies:
 - **UniTask**
 - **Stateless**
 - **Odin Inspector**
+- **FEEL**
 
 ## Getting Started
 
@@ -44,8 +45,9 @@ _You can find the source files in the `Assets/Sources` folder._
 
 ### Prerequisites
 
-- **Unity:** Ensure you have the appropriate version of Unity installed.
+- **Unity:** Ensure you have the appropriate version of Unity installed (2022.3.60f1).
 - **Odin Inspector:** To compile and run the project locally, you must import your own copy of the Odin Inspector asset package (this is a paid asset).
+- **FEEL**: To compile and run the project locally, you must import your own copy of the FEEL asset package (this is a paid asset).
 
 ## Gameplay
 

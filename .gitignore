@@ -83,3 +83,8 @@ crashlytics-build.properties
 # Hide Nuget Packages
 /[Aa]ssets/Packages.meta
 /[Aa]ssets/Packages/*
+
+# Removed FEEL assets due to copyright
+/[Aa]ssets/ThirdParty.meta
+/[Aa]ssets/ThirdParty/Feel.meta
+/[Aa]ssets/ThirdParty/Feel/*
