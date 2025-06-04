@@ -1,5 +1,4 @@
-﻿using System;
-using Fusion;
+﻿using Fusion;
 using KickinIt.Simulation.Input;
 using UnityEngine;
 using VContainer;
@@ -38,6 +37,11 @@ namespace KickinIt.Simulation.Player
         {
             _track = track;
             _transform = transform;
+        }
+
+        public override void Spawned()
+        {
+            Runner.SetIsSimulated(Object, true);
         }
 
         public override void FixedUpdateNetwork()
@@ -92,12 +96,6 @@ namespace KickinIt.Simulation.Player
             {
                 InputPhaseStartTime = Runner.SimulationTime;
             }
-        }
-
-        public override void Render()
-        {
-            // update 3D
-            UpdatePosition3D();
         }
 
         private void UpdatePosition3D()
