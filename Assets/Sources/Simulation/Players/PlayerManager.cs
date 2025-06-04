@@ -130,6 +130,7 @@ namespace KickinIt.Simulation.Player
             
             // Initialize Player Simulation
             var playerSimulation = scope.Container.Resolve<IPlayerSimulation>();
+            playerSimulation.InitializePlayer();
             playerSimulation.ResetPlayer();
         }
     }

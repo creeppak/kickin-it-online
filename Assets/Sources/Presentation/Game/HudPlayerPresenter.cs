@@ -2,6 +2,7 @@
 using R3;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using VContainer;
 
 namespace KickinIt.Presentation.Match
@@ -10,6 +11,7 @@ namespace KickinIt.Presentation.Match
     {
         [SerializeField] private TMP_Text playerName;
         [SerializeField] private TMP_Text healthPoints;
+        [SerializeField] private Image pushCooldown;
         
         private IPlayer _player;
 
@@ -26,6 +28,20 @@ namespace KickinIt.Presentation.Match
             _player.OnHealthUpdated
                 .Subscribe(_ => UpdateHealth())
                 .AddTo(this);
+
+            _player.Color
+                .Subscribe(UpdateColor)
+                .AddTo(this);
+        }
+
+        private void Update()
+        {
+            pushCooldown.fillAmount = _player.PushCooldownNormalized; // timers update each frame
+        }
+
+        private void UpdateColor(Color color)
+        {
+            playerName.color = color;
         }
 
         private void UpdateHealth()

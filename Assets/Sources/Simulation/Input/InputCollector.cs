@@ -12,9 +12,9 @@ namespace KickinIt.Simulation.Input
             _inputWriters = inputWriters;
         }
 
-        public MyNetworkInput CollectInput(NetworkRunner networkRunner)
+        public KickingItNetworkInput CollectInput(NetworkRunner networkRunner)
         {
-            var inputData = new MyNetworkInput
+            var inputData = new KickingItNetworkInput
             {
                 movement = 0f
             };

@@ -13,6 +13,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "Bounce",
+                    "type": "Button",
+                    "id": "5a511b84-def2-4f3d-9a6d-637edfe4dc11",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -81,6 +90,17 @@
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "4bfc5068-c71d-42a7-bcfd-e50545a009dc",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Bounce",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

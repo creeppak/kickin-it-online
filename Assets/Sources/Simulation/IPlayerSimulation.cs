@@ -13,5 +13,6 @@ namespace KickinIt.Simulation
 
         void ResetPlayer();
         void SetImmortal(bool immortal);
+        void InitializePlayer();
     }
 }

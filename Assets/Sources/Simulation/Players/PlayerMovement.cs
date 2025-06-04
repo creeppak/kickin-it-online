@@ -44,7 +44,7 @@ namespace KickinIt.Simulation.Player
         {
             var input = 0f;
             
-            if (GetInput(out MyNetworkInput inputData))
+            if (GetInput(out KickingItNetworkInput inputData))
             {
                 input = Mathf.Clamp(inputData.movement, -1f, 1f);
             }

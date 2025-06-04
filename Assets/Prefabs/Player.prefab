@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 7195335052045498477}
   - component: {fileID: 4930284353021081398}
   - component: {fileID: 6038076461296453303}
+  - component: {fileID: 7819793380293119688}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -39,6 +40,7 @@ Transform:
   m_Children:
   - {fileID: 4665164522916089219}
   - {fileID: 8738966143354161892}
+  - {fileID: 1936891632132014781}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1188818447336218489
@@ -63,6 +65,8 @@ MonoBehaviour:
   - {fileID: 7131857107018174590}
   - {fileID: 7195335052045498477}
   - {fileID: 4930284353021081398}
+  - {fileID: 7819793380293119688}
+  - {fileID: 8303178290714536721}
   ForceRemoteRenderTimeframe: 0
 --- !u!114 &9217829999498219356
 MonoBehaviour:
@@ -97,6 +101,8 @@ MonoBehaviour:
   health: {fileID: 7131857107018174590}
   readinessSystem: {fileID: 7195335052045498477}
   camera: {fileID: 4930284353021081398}
+  color: {fileID: 7819793380293119688}
+  pushForce: {fileID: 8303178290714536721}
 --- !u!114 &3126717706213358497
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,6 +115,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 301623d6f2f54fa4b3207785693e8485, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rigidbody: {fileID: 6038076461296453303}
   baseSpeed: 12
   inputThreshold: 0.1
   attackTime: 0.166
@@ -186,7 +193,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   stopThreshold: 0.1
-  rigidbody: {fileID: 6038076461296453303}
 --- !u!114 &7131857107018174590
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -252,6 +258,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &7819793380293119688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1890267725027732791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e5f94c538f34eb5a900cbd6dd6f60af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4078200387695647888
 GameObject:
   m_ObjectHideFlags: 0
@@ -307,6 +325,80 @@ CapsuleCollider:
   m_Height: 1.33
   m_Direction: 0
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &9177170387044589873
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1936891632132014781}
+  - component: {fileID: 3326573400318013558}
+  - component: {fileID: 8303178290714536721}
+  m_Layer: 0
+  m_Name: Push Force
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1936891632132014781
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9177170387044589873}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 124955492884760295}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &3326573400318013558
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9177170387044589873}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.65
+  m_Height: 1.5
+  m_Direction: 0
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8303178290714536721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9177170387044589873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7982eaac867a4ab987584b54ca5e05c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  capsuleCollider: {fileID: 3326573400318013558}
+  ballMask:
+    serializedVersion: 2
+    m_Bits: 128
+  pushCooldown: 1
+  pushForceScale: 1.2
 --- !u!1001 &4660339941438804259
 PrefabInstance:
   m_ObjectHideFlags: 0

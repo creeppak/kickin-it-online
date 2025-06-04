@@ -1,7 +1,9 @@
 ﻿using Fusion;
+using KickinIt.Simulation.Players;
 using KickinIt.Simulation.Track;
 using R3;
 using Sources.Common;
+using UnityEngine;
 
 namespace KickinIt.Simulation.Player
 {
@@ -9,8 +11,11 @@ namespace KickinIt.Simulation.Player
     {
         private readonly PlayerHealth _playerHealth;
         private readonly PlayerReadinessSystem _playerReadinessSystem;
+        private readonly FancyNameProvider _fancyNameProvider;
+        private readonly PlayerColor _playerColor;
+        private readonly PlayerBallBouncer _pushForce;
+        
         private PlayerRef _playerRef;
-        private FancyNameProvider _fancyNameProvider;
 
         public NetworkObject NetworkObject { get; }
         
@@ -21,6 +26,10 @@ namespace KickinIt.Simulation.Player
 
         Observable<IPlayer> IPlayer.OnHealthOver => _playerHealth.OnHealthOver
             .Select(_ => this as IPlayer);
+
+        public float PushCooldownNormalized => _pushForce.PushCooldownNormalized;
+
+        public ReadOnlyReactiveProperty<Color> Color => _playerColor.MainColor;
 
         public Observable<IPlayerSimulation> OnHealthDown => _playerHealth.OnHealthDown
             .Select(_ => this as IPlayerSimulation);
@@ -38,8 +47,12 @@ namespace KickinIt.Simulation.Player
             PlayerReadinessSystem playerReadinessSystem,
             NetworkObject networkObject, 
             FancyNameProvider fancyNameProvider,
-            PlayerRef playerRef)
+            PlayerRef playerRef,
+            PlayerColor playerColor,
+            PlayerBallBouncer pushForce)
         {
+            _pushForce = pushForce;
+            _playerColor = playerColor;
             _playerRef = playerRef;
             _fancyNameProvider = fancyNameProvider;
             NetworkObject = networkObject;
@@ -56,5 +69,10 @@ namespace KickinIt.Simulation.Player
         }
 
         public void SetImmortal(bool immortal) => _playerHealth.SetImmortal(immortal);
+        
+        public void InitializePlayer()
+        {
+            _playerColor.PickRandomColor();
+        }
     }
 }

@@ -9,22 +9,28 @@ namespace KickinIt.Simulation.Input
     {
         [SerializeField] private InputActionAsset inputActions;
         
-        private InputAction moveAction;
+        private InputAction _moveAction;
+        private InputAction _bounceAction;
 
         private void OnEnable()
         {
-            moveAction = inputActions.FindAction("Move");
-            moveAction.Enable();
+            _moveAction = inputActions.FindAction("Move");
+            _moveAction.Enable();
+            
+            _bounceAction = inputActions.FindAction("Bounce");
+            _bounceAction.Enable();
         }
 
         private void OnDisable()
         {
-            moveAction.Disable();
+            _moveAction.Disable();
+            _bounceAction.Disable();
         }
 
-        public MyNetworkInput WriteInput(NetworkRunner networkRunner, MyNetworkInput inputData)
+        public KickingItNetworkInput WriteInput(NetworkRunner networkRunner, KickingItNetworkInput inputData)
         {
-            inputData.movement = moveAction.ReadValue<float>();
+            inputData.movement = _moveAction.ReadValue<float>();
+            inputData.buttons.Set(KickingItButtons.Push, _bounceAction.triggered);
 
             return inputData;
         }

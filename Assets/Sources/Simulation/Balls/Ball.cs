@@ -1,4 +1,5 @@
-﻿using Fusion;
+﻿using System;
+using Fusion;
 using UnityEngine;
 
 namespace KickinIt.Simulation.Balls
@@ -10,19 +11,24 @@ namespace KickinIt.Simulation.Balls
         [SerializeField] private float spawnSpeed = 1f;
         [SerializeField] private float acceleration = 5f;
         [SerializeField] private float deceleration = 0.5f;
+        [SerializeField] private float maxSpeedStepScale = 1f / 8f;
         
         // [SerializeField] private float hitMaxSpeedBonusScale = 1.2f; todo: implement the mechanic
         
-        [Networked] private float MaxSpeed { get; set; }
+        [Networked] private float MaxSpeedNetworked { get; set; }
+        [Networked] private int MaxSpeedStep { get; set; }
+        
+        public float CurrentMaxSpeed => MaxSpeedNetworked;
 
         public override void Spawned() // use INetworkInitializable if you need dependencies
         {
             Runner.SetIsSimulated(Object, true);
+            MaxSpeedStep = 0;
         }
 
         public void InitializeOnServer(Vector3 direction)
         {
-            MaxSpeed = startMaxSpeed;
+            MaxSpeedNetworked = startMaxSpeed;
             rigidBody.velocity = direction * spawnSpeed;
         }
 
@@ -31,7 +37,7 @@ namespace KickinIt.Simulation.Balls
             var currentSpeed = rigidBody.velocity.magnitude;
             float newSpeed;
 
-            if (currentSpeed >= MaxSpeed)
+            if (currentSpeed >= MaxSpeedNetworked)
             {
                 newSpeed = currentSpeed - deceleration * Runner.DeltaTime;
             }
@@ -41,6 +47,17 @@ namespace KickinIt.Simulation.Balls
             }
             
             rigidBody.velocity = rigidBody.velocity.normalized * newSpeed;
+        }
+
+        public void Push(Vector3 velocity)
+        {
+            rigidBody.velocity = velocity;
+        }
+
+        public void IncrementMaxSpeedStep()
+        {
+            MaxSpeedStep++;
+            MaxSpeedNetworked = startMaxSpeed * (1f + maxSpeedStepScale * maxSpeedStepScale);
         }
     }
 }

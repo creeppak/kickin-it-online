@@ -4,6 +4,6 @@ namespace KickinIt.Simulation.Input
 {
     public interface IInputWriter
     {
-        MyNetworkInput WriteInput(NetworkRunner networkRunner, MyNetworkInput inputData);
+        KickingItNetworkInput WriteInput(NetworkRunner networkRunner, KickingItNetworkInput inputData);
     }
 }

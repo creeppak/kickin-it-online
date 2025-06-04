@@ -15,6 +15,8 @@ namespace KickinIt.Simulation.Player
         [SerializeField] private PlayerHealth health;
         [SerializeField] private PlayerReadinessSystem readinessSystem;
         [SerializeField] private new PlayerCamera camera;
+        [SerializeField] private PlayerColor color;
+        [SerializeField] private PlayerBallBouncer pushForce;
 
         private void OnValidate()
         {
@@ -34,6 +36,8 @@ namespace KickinIt.Simulation.Player
             builder.RegisterComponent(health).AsImplementedInterfaces().AsSelf();
             builder.RegisterComponent(readinessSystem);
             builder.RegisterComponent(camera);
+            builder.RegisterComponent(color);
+            builder.RegisterComponent(pushForce);
             
             builder.Register(ResolvePlayerTrack, Lifetime.Singleton);
             
