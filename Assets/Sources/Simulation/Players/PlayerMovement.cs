@@ -21,11 +21,13 @@ namespace KickinIt.Simulation.Player
         private Transform _transform;
         
         [Networked] private float X { get; set; }
-        [Networked] private float Velocity { get; set; }
+        [Networked] private float VelocityNetworked { get; set; }
         [Networked] private float InputPhaseStartTime { get; set; }
         [Networked] private bool WasAcceleratingLastTick { get; set; }
         
         private float InputPhaseTime => Runner.SimulationTime - InputPhaseStartTime;
+        
+        public float Velocity => VelocityNetworked;
 
         private void OnValidate()
         {
@@ -70,11 +72,11 @@ namespace KickinIt.Simulation.Player
                 var speed = InputPhaseTime < attackTime
                     ? attackCurve.Evaluate(InputPhaseTime / attackTime) * inputSpeed // attack curve
                     : inputSpeed; // hold curve
-                Velocity = inputDirection * speed;
+                VelocityNetworked = inputDirection * speed;
             }
-            else if (Mathf.Abs(Velocity) < stopThreshold)
+            else if (Mathf.Abs(VelocityNetworked) < stopThreshold)
             {
-                Velocity = 0f;
+                VelocityNetworked = 0f;
             }
             else
             {
@@ -84,10 +86,10 @@ namespace KickinIt.Simulation.Player
                     ResetInputPhaseTime();
                 }
                 
-                Velocity *= releaseCurve.Evaluate(InputPhaseTime / releaseTime);
+                VelocityNetworked *= releaseCurve.Evaluate(InputPhaseTime / releaseTime);
             }
 
-            X += Velocity * Runner.DeltaTime;
+            X += VelocityNetworked * Runner.DeltaTime;
             X = _track.ClampPosition(X);
             
             UpdatePosition3D();
