@@ -11,6 +11,8 @@ namespace KickinIt.Simulation.Input
         
         private InputAction _moveAction;
         private InputAction _bounceAction;
+        
+        private NetworkButtons _accumulatedButtons;
 
         private void OnEnable()
         {
@@ -27,10 +29,17 @@ namespace KickinIt.Simulation.Input
             _bounceAction.Disable();
         }
 
+        private void Start()
+        {
+            _bounceAction.performed += _ => _accumulatedButtons.Set(KickingItButtons.Push, true);
+        }
+
         public KickingItNetworkInput WriteInput(NetworkRunner networkRunner, KickingItNetworkInput inputData)
         {
             inputData.movement = _moveAction.ReadValue<float>();
-            inputData.buttons.Set(KickingItButtons.Push, _bounceAction.triggered);
+            inputData.buttons = _accumulatedButtons;
+
+            _accumulatedButtons = new NetworkButtons(); // reset buttons
 
             return inputData;
         }

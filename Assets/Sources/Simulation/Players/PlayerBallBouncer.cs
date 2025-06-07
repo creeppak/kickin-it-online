@@ -3,6 +3,7 @@ using System.Linq;
 using Fusion;
 using KickinIt.Simulation.Balls;
 using KickinIt.Simulation.Input;
+using R3;
 using UnityEngine;
 using VContainer;
 
@@ -16,12 +17,16 @@ namespace KickinIt.Simulation.Players
         [SerializeField] private float pushForceScale = 1.5f;
         
         private readonly Collider[] _overlapBuffer = new Collider[8];
+        private readonly Subject<int> _pushedSubject = new();
         private PhysicsScene _physicsScene;
         private Transform _colliderTransform;
+        private int _localPushedTimes;
 
         [Networked] private float LastPushTime { get; set; }
+        [Networked] private int PushedTimes { get; set; }
         
         public float PushCooldownNormalized => Mathf.Clamp01((Runner.SimulationTime - LastPushTime) / pushCooldown);
+        public Observable<int> Pushed => _pushedSubject;
 
         [Inject]
         private void Construct(PhysicsScene physicsScene)
@@ -54,9 +59,19 @@ namespace KickinIt.Simulation.Players
             TriggerPush();
         }
 
+        public override void Render()
+        {
+            if (_localPushedTimes < PushedTimes)
+            {
+                _localPushedTimes = PushedTimes;
+                _pushedSubject.OnNext(_localPushedTimes);
+            }
+        }
+
         private void TriggerPush()
         {
             LastPushTime = Runner.SimulationTime;
+            PushedTimes++;
             
             var capsuleDirection = DirectionToVector(capsuleCollider.direction);
             var worldCapsuleCenter = _colliderTransform.TransformPoint(capsuleCollider.center);

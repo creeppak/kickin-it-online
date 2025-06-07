@@ -1,4 +1,6 @@
+using System;
 using KickinIt.Simulation.Player;
+using R3;
 using UnityEngine;
 using VContainer;
 
@@ -8,17 +10,27 @@ namespace KickinIt.Simulation.Players
     {
         private static readonly int Speed = Animator.StringToHash("Speed");
         private static readonly int IdleTime = Animator.StringToHash("IdleTime");
+        private static readonly int Push = Animator.StringToHash("Push");
         
         [SerializeField] private Animator animator;
         
         private PlayerMovement _playerMovement;
+        private PlayerBallBouncer _ballBouncer;
         
         private float _idleTime = 0f;
 
         [Inject]
-        private void Construct(PlayerMovement playerMovement)
+        private void Construct(PlayerMovement playerMovement, PlayerBallBouncer ballBouncer)
         {
+            _ballBouncer = ballBouncer;
             _playerMovement = playerMovement;
+        }
+
+        private void Start()
+        {
+            _ballBouncer.Pushed
+                .Subscribe(_ => OnPush())
+                .AddTo(this);
         }
 
         private void Update()
@@ -36,6 +48,11 @@ namespace KickinIt.Simulation.Players
             }
             
             animator.SetFloat(IdleTime, _idleTime);
+        }
+
+        private void OnPush()
+        {
+            animator.SetTrigger(Push);
         }
     }
 }
