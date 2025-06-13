@@ -17,15 +17,18 @@ namespace KickinIt.Simulation.Players
         [SerializeField] private float pushCooldown;
         [SerializeField] private float pushForceScale = 1.5f;
         [SerializeField] private UnityEvent pushedEvent;
+        [SerializeField] private UnityEvent ballPushedEvent;
         
         private readonly Collider[] _overlapBuffer = new Collider[8];
         private readonly Subject<int> _pushedSubject = new();
         private PhysicsScene _physicsScene;
         private Transform _colliderTransform;
         private int _localPushedTimes;
+        private int _localBallPushedTimes;
 
         [Networked] private float LastPushTime { get; set; }
         [Networked] private int PushedTimes { get; set; }
+        [Networked] private int BallPushedTimes { get; set; }
         
         public float PushCooldownNormalized => Mathf.Clamp01((Runner.SimulationTime - LastPushTime) / pushCooldown);
         public Observable<int> Pushed => _pushedSubject;
@@ -69,6 +72,12 @@ namespace KickinIt.Simulation.Players
                 _pushedSubject.OnNext(_localPushedTimes);
                 pushedEvent.Invoke();
             }
+            
+            if (_localBallPushedTimes < BallPushedTimes)
+            {
+                _localBallPushedTimes = BallPushedTimes;
+                ballPushedEvent.Invoke();
+            }
         }
 
         private void TriggerPush()
@@ -92,18 +101,26 @@ namespace KickinIt.Simulation.Players
             }
             
             var objectsToPush = Enumerable.Range(0, overlapCount).Select(i => _overlapBuffer[i]);
+            var atLeastOneBallPushed = false;
 
             foreach (var objectToPush in objectsToPush)
             {
                 var ball = objectToPush.GetComponent<Ball>();
                 
                 if (!ball) continue;
+
+                atLeastOneBallPushed = true;
                 
                 var pushDirection = (ball.transform.position - worldCapsuleCenter).normalized;
                 var pushStrength = ball.CurrentMaxSpeed * pushForceScale;
                 
                 ball.Push(pushDirection * pushStrength);
                 ball.IncrementMaxSpeedStep();
+            }
+
+            if (atLeastOneBallPushed)
+            {
+                BallPushedTimes++;
             }
         }
 
