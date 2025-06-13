@@ -40,6 +40,7 @@ namespace KickinIt.Simulation.Game
             builder.RegisterComponent(playerRegistry);
             builder.RegisterComponent(trackProvider);
             builder.RegisterComponent(ballSpawner);
+            builder.Register<BallFactory>(Lifetime.Singleton);
             builder.Register(_ => gameObject.scene.GetPhysicsScene(), Lifetime.Singleton);
             
             builder.Register<InputCollector>(Lifetime.Singleton);

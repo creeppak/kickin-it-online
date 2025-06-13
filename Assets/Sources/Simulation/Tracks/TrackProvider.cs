@@ -10,5 +10,13 @@ namespace KickinIt.Simulation.Track
         {
             return tracks[playerIndex];
         }
+
+        public void ResetAllTracks()
+        {
+            foreach (var track in tracks)
+            {
+                track.SetupForNoPlayer();
+            }
+        }
     }
 }

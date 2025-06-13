@@ -1,4 +1,5 @@
 ﻿using System;
+using KickinIt.Simulation.Track;
 using R3;
 using VContainer.Unity;
 
@@ -8,23 +9,27 @@ namespace KickinIt.Simulation.Player
     {
         private readonly PlayerCamera _playerCamera;
         private readonly IGameSimulation _gameSimulation;
+        private readonly PlayerTrack _playerTrack;
         
         private DisposableBag _disposableBag;
 
-        public PlayerSimulationBoot(PlayerCamera playerCamera, IGameSimulation gameSimulation)
+        public PlayerSimulationBoot(PlayerCamera playerCamera, IGameSimulation gameSimulation, PlayerTrack playerTrack)
         {
+            _playerTrack = playerTrack;
             _gameSimulation = gameSimulation;
             _playerCamera = playerCamera;
         }
 
         public void Start()
         {
+            _playerTrack.SetupForPlayer();
+            
             _gameSimulation.Phase
                 .Subscribe(onNext: phase =>
                 {
                     if (phase == SimulationPhase.Countdown)
                     {
-                        _playerCamera.TryActivateCamera();
+                        _playerCamera.ActivateCameraIfLocalPlayer();
                     }
                 })
                 .AddTo(ref _disposableBag);
@@ -32,8 +37,8 @@ namespace KickinIt.Simulation.Player
 
         public void Dispose()
         {
+            _playerTrack.SetupForNoPlayer();
             _playerCamera.DeactivateCamera();
-            
             _disposableBag.Dispose();
         }
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using Fusion;
 using KickinIt.Simulation.Game;
 using KickinIt.Simulation.Synchronization;
+using KickinIt.Simulation.Track;
 using R3;
 using UnityEngine;
 using VContainer;
@@ -23,6 +24,7 @@ namespace KickinIt.Simulation.Player
         private LifetimeScope _lifetimeScope;
         private PlayerRegistry _playerRegistry;
         private NetworkBindingService _networkBindingService;
+        private TrackProvider _trackProvider;
 
         public int PlayerCount => _playerRegistry.PlayerCount;
 
@@ -32,8 +34,10 @@ namespace KickinIt.Simulation.Player
         public Observable<Unit> PlayerLeft => _onPlayerLeft;
 
         [Inject]
-        private void Construct(NetworkRunner networkRunner, PlayerRegistry playerRegistry, LifetimeScope lifetimeScope, NetworkBindingService networkBindingService)
+        private void Construct(NetworkRunner networkRunner, PlayerRegistry playerRegistry, LifetimeScope lifetimeScope,
+            NetworkBindingService networkBindingService, TrackProvider trackProvider)
         {
+            _trackProvider = trackProvider;
             _networkBindingService = networkBindingService;
             _playerRegistry = playerRegistry;
             _lifetimeScope = lifetimeScope;
@@ -42,6 +46,8 @@ namespace KickinIt.Simulation.Player
 
         public void Initialize()
         {
+            _trackProvider.ResetAllTracks();
+            
             _networkBindingService.Track<PlayerNetworkBinder>()
                 .IgnoreOnErrorResume(Debug.LogException)
                 .Subscribe(OnPlayerSpawnedOnClient)

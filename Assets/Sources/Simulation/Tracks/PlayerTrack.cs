@@ -14,12 +14,15 @@ namespace KickinIt.Simulation.Track
         [FormerlySerializedAs("_virtualCamera")] 
         [SerializeField] private CinemachineVirtualCamera virtualCamera;
         [SerializeField] private GatesTrigger gatesTrigger;
+        [SerializeField] private GameObject playerSetup;
+        [SerializeField] private GameObject noPlayerSetup;
         
         public float TrackLength => splineContainer[0].GetLength();
         public float MinPosition => -TrackLength / 2f;
         public float MaxPosition => TrackLength / 2f;
 
         public GatesTrigger GatesTrigger => gatesTrigger;
+        public CinemachineVirtualCamera VirtualCamera => virtualCamera;
 
         private void Awake()
         {
@@ -39,7 +42,6 @@ namespace KickinIt.Simulation.Track
 
         public Quaternion GetRotation(float x)
         {
-            
             var time = Mathf.InverseLerp(MinPosition, MaxPosition, x);
             var tangent = splineContainer.EvaluateTangent(0, Mathf.Max(time, 0.01f)); // tangent is undefined at 0
             var lookAtSplineForward = Quaternion.LookRotation(tangent, Vector3.up);
@@ -47,15 +49,21 @@ namespace KickinIt.Simulation.Track
             return lookAtSplineForward * rotateLeft;
         }
 
-        public void SetVirtualCameraActive(bool isCameraActive)
+        public void SetupForPlayer()
         {
-            if (!virtualCamera)
-            {
-                Debug.Log("Virtual camera is null. Ignoring activation/deactivation.");
-                return;
-            }
-            
-            virtualCamera.gameObject.SetActive(isCameraActive);
+            playerSetup.SetActive(true);
+            noPlayerSetup.SetActive(false);
+        }
+
+        public void SetupForNoPlayer()
+        {
+            playerSetup.SetActive(false);
+            noPlayerSetup.SetActive(true);
+        }
+
+        public float GetNormalizedPosition(float x)
+        {
+            return Mathf.InverseLerp(MinPosition, MaxPosition, x);
         }
     }
 }

@@ -5,6 +5,7 @@ using KickinIt.Simulation.Balls;
 using KickinIt.Simulation.Input;
 using R3;
 using UnityEngine;
+using UnityEngine.Events;
 using VContainer;
 
 namespace KickinIt.Simulation.Players
@@ -15,6 +16,7 @@ namespace KickinIt.Simulation.Players
         [SerializeField] private LayerMask ballMask;
         [SerializeField] private float pushCooldown;
         [SerializeField] private float pushForceScale = 1.5f;
+        [SerializeField] private UnityEvent pushedEvent;
         
         private readonly Collider[] _overlapBuffer = new Collider[8];
         private readonly Subject<int> _pushedSubject = new();
@@ -65,6 +67,7 @@ namespace KickinIt.Simulation.Players
             {
                 _localPushedTimes = PushedTimes;
                 _pushedSubject.OnNext(_localPushedTimes);
+                pushedEvent.Invoke();
             }
         }
 

@@ -2,6 +2,6 @@
 {
     internal static class GameSimulationConstants
     {
-        public const string SimulationSceneName = "Game Simulation"; // using single scene for now
+        public const string SimulationSceneName = "Arena 2"; // using single scene for now
     }
 }

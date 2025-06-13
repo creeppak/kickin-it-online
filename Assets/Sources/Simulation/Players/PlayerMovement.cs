@@ -28,6 +28,8 @@ namespace KickinIt.Simulation.Player
         private float InputPhaseTime => Runner.SimulationTime - InputPhaseStartTime;
         
         public float Velocity => VelocityNetworked;
+        
+        public float XNormalized => _track.GetNormalizedPosition(X);
 
         private void OnValidate()
         {

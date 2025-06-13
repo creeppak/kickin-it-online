@@ -10,11 +10,19 @@ namespace KickinIt.Simulation.Balls
     internal class BallSpawner : NetworkBehaviour
     {
         [SerializeField] private NetworkPrefabRef ballPrefab;
+        [SerializeField] private float minSpawnZoneRadius = 1f;
         [SerializeField] private float spawnZoneRadius = 5f;
         
         private Transform _transform;
+        private BallFactory _factory;
 
         [Networked] private Ball ActiveBall { get; set; }
+        
+        [Inject]
+        private void Construct(BallFactory factory)
+        {
+            _factory = factory;
+        }
 
         private void Awake()
         {
@@ -34,6 +42,7 @@ namespace KickinIt.Simulation.Balls
         private void DrawGizmos(Color color)
         {
             Gizmos.color = color;
+            Gizmos.DrawWireSphere(transform.position, minSpawnZoneRadius);
             Gizmos.DrawWireSphere(transform.position, spawnZoneRadius);
         }
 
@@ -41,17 +50,13 @@ namespace KickinIt.Simulation.Balls
         {
             if (ActiveBall != null) throw new Exception("Only one ball can be active at a time.");
             
-            var spawnAtRadius = Random.Range(0f, spawnZoneRadius);
+            var spawnAtRadius = Random.Range(minSpawnZoneRadius, spawnZoneRadius);
             var spawnRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
             var spawnPosition = spawnRotation * new Vector3(spawnAtRadius, 0f, 0f);
             var worldSpawnPosition = _transform.transform.position + spawnPosition;
             var moveDirection = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f) * Vector3.forward;
 
-            var ballNetworkObject = Runner.Spawn(
-                ballPrefab, 
-                worldSpawnPosition, 
-                Quaternion.identity, 
-                onBeforeSpawned: (_, o) => o.GetComponent<Ball>().InitializeOnServer(moveDirection));
+            var ballNetworkObject = _factory.Create(ballPrefab, worldSpawnPosition, moveDirection);
             ActiveBall = ballNetworkObject.GetComponent<Ball>();
         }
 
