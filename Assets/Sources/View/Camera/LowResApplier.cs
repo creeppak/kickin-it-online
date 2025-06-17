@@ -34,8 +34,6 @@ namespace KickinIt.Simulation.Camera
 
             var targetScale = targetLowResHeight / Screen.height;
             var currentScale = _urp.renderScale;
-            
-            Debug.Log($"Target scale is {targetScale}");
 
             if (Mathf.Abs(targetScale - currentScale) < 0.001f)
             {

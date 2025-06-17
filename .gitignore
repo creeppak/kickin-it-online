@@ -84,7 +84,9 @@ crashlytics-build.properties
 /[Aa]ssets/Packages.meta
 /[Aa]ssets/Packages/*
 
-# Removed FEEL assets due to copyright
+# Removed ThirdParty assets due to copyright
 /[Aa]ssets/ThirdParty.meta
 /[Aa]ssets/ThirdParty/Feel.meta
 /[Aa]ssets/ThirdParty/Feel/*
+/[Aa]ssets/ThirdParty/AmplifyColor.meta
+/[Aa]ssets/ThirdParty/AmplifyColor/*

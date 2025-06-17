@@ -19,6 +19,7 @@ namespace KickinIt.Simulation.Game
         [SerializeField] private TrackProvider trackProvider;
         [SerializeField] private KartInputWriter kartInputWriter;
         [SerializeField] private BallSpawner ballSpawner;
+        [SerializeField] private GameCountdownHandler gameCountdownHandler;
 
         private void OnValidate()
         {
@@ -41,6 +42,10 @@ namespace KickinIt.Simulation.Game
             builder.RegisterComponent(trackProvider);
             builder.RegisterComponent(ballSpawner);
             builder.Register<BallFactory>(Lifetime.Singleton);
+            builder.RegisterComponent(gameCountdownHandler)
+                .AsSelf()
+                .AsImplementedInterfaces();
+            
             builder.Register(_ => gameObject.scene.GetPhysicsScene(), Lifetime.Singleton);
             
             builder.Register<InputCollector>(Lifetime.Singleton);
