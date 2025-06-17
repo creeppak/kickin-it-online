@@ -1,17 +1,19 @@
 ﻿using Fusion;
 using KickinIt.Simulation.Players;
-using KickinIt.Simulation.Synchronization;
 using KickinIt.Simulation.Track;
 using R3;
 using UnityEngine;
+using UnityEngine.Events;
 using VContainer;
-using VContainer.Unity;
 
 namespace KickinIt.Simulation.Player
 {
     internal class PlayerHealth : NetworkBehaviour, IPlayerInitializable
     {
         [SerializeField] private int startHealth = 5;
+        [SerializeField] private UnityEvent onHealthDownUnity;
+        [SerializeField] private UnityEvent onHealthOverUnity;
+        
         
         private PlayerTrack _playerTrack;
         private bool _immortal;
@@ -42,7 +44,32 @@ namespace KickinIt.Simulation.Player
 
         public override void Render()
         {
+            var localHealthPoints = _localHealthPoints.Value;
+            
             _localHealthPoints.Value = HealthPoints;
+            
+            if (Object.HasStateAuthority)
+            {
+                return; // ignore for server
+            }
+
+            if (localHealthPoints == HealthPoints)
+            {
+                return; // no changes, ignore
+            }
+
+            if (HealthPoints <= 0)
+            {
+                _onHealthOver.OnNext(Unit.Default);
+                onHealthOverUnity?.Invoke();
+                return;
+            }
+
+            if (HealthPoints < localHealthPoints)
+            {
+                _onHealthDown.OnNext(HealthPoints);
+                onHealthDownUnity?.Invoke();
+            }
         }
 
         public void ResetHealth()
@@ -65,10 +92,12 @@ namespace KickinIt.Simulation.Player
             if (HealthPoints > 0)
             {
                 _onHealthDown.OnNext(HealthPoints);
+                onHealthDownUnity?.Invoke();
             }
             else
             {
                 _onHealthOver.OnNext(Unit.Default);
+                onHealthOverUnity?.Invoke();
             }
         }
     }
