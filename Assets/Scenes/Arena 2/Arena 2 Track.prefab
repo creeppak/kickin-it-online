@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4165664563523507339}
   - component: {fileID: 1204772935652390396}
   - component: {fileID: 5932251807935329627}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PolyShape
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1312,7 +1312,7 @@ GameObject:
   - component: {fileID: 2395443046941580647}
   - component: {fileID: 6604701119059515375}
   - component: {fileID: 7120520085241960594}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PolyShape (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

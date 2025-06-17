@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4453038336108041370}
   - component: {fileID: 5101877214253881327}
   - component: {fileID: 8981962366929228389}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cylinder (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -647,7 +647,7 @@ GameObject:
   - component: {fileID: 1058251907228199583}
   - component: {fileID: 704205328076491143}
   - component: {fileID: 4604791187999193025}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PolyShape
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1064,7 +1064,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1359152475747172188}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Corner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
