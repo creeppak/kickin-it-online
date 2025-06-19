@@ -26,9 +26,10 @@ namespace KickinIt.Simulation.Player
         private NetworkBindingService _networkBindingService;
         private TrackProvider _trackProvider;
 
-        public int PlayerCount => _playerRegistry.PlayerCount;
+        public ReadOnlyReactiveProperty<int> PlayerCount => _playerRegistry.PlayerCount;
+        public int PlayerReadyCount => _playerRegistry.EnumerateAllPlayers().Count(p => p.IsReady.CurrentValue); 
 
-        public bool AllPlayersReady => _playerRegistry.CollectAllPlayers().All(simulation => simulation.IsReady);
+        public bool AllPlayersReady => _playerRegistry.CollectAllPlayers().All(simulation => simulation.IsReady.CurrentValue);
         
         public Observable<Unit> PlayerJoined => _onPlayerJoined;
         public Observable<Unit> PlayerLeft => _onPlayerLeft;

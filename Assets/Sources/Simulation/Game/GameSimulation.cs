@@ -63,6 +63,8 @@ namespace KickinIt.Simulation.Game
         public Observable<SimulationPhase> Phase => _phase;
         public Observable<int> Countdown => _countdown;
         public string SessionCode => _simulationArgs.sessionCode;
+        public ReadOnlyReactiveProperty<int> PlayerCount => _playerManager.PlayerCount;
+        public int PlayerReadyCount => _playerManager.PlayerReadyCount; 
 
         [Inject]
         private void Configure(SimulationArgs simulationArgs, GameNetwork network, PlayerManager playerManager,
@@ -93,6 +95,29 @@ namespace KickinIt.Simulation.Game
         public async UniTask StartSimulation() => await _stateMachine.FireAsync(Trigger.StartSimulation);
         public async UniTask TerminateSimulation() => await _stateMachine.FireAsync(Trigger.ForceTerminate);
         
+        public void StartGame()
+        {
+            if (!Object.HasStateAuthority)
+            {
+                Debug.LogError("Only host can start the game.");
+                return;
+            }
+
+            if (_playerManager.PlayerCount.CurrentValue < 2)
+            {
+                Debug.LogError("At least 2 player required to start the game.");
+                return;
+            }
+            
+            if (!_playerManager.AllPlayersReady)
+            {
+                Debug.LogError("Not all players are ready to start the game.");
+                return;
+            }
+
+            _stateMachine.Fire(Trigger.StartCountdown);
+        }
+
         public IPlayer GetPlayer(int index)
         {
             return _playerManager.TryGetPlayer(PlayerRef.FromIndex(index), out IPlayerSimulation playerSimulation) 
@@ -104,6 +129,8 @@ namespace KickinIt.Simulation.Game
         {
             return UniTask.WaitUntil(() => _playerManager.HasPlayer(Runner.LocalPlayer));
         }
+
+        public int LocalPlayerIndex => Runner.LocalPlayer.AsIndex;
 
         private void ConfigureStateMachine()
         {
@@ -124,23 +151,9 @@ namespace KickinIt.Simulation.Game
                 .Permit(Trigger.StartCountdown, State.Countdown)
                 .OnEntry(() =>
                 {
-                    // Automatically mark player as ready
-                    _playerManager.GetPlayer(Runner.LocalPlayer).SetReady(true);
-
-                    if (!Object.HasStateAuthority) return;
-
-                    // Listen for all players to get ready
-                    Observable.EveryUpdate()
-                        .Where(AllPlayersReady)
-                        .Take(1)
-                        .Subscribe(_ => _stateMachine.Fire(Trigger.StartCountdown))
-                        .AddTo(ref _currentStateBag);
-                    
-                    bool AllPlayersReady(Unit _)
+                    if (_simulationArgs.singlePlayer)
                     {
-                        if (_simulationArgs.singlePlayer) { return true; }
-
-                        return _playerManager.PlayerCount >= 2 && _playerManager.AllPlayersReady;
+                        _stateMachine.Fire(Trigger.StartCountdown); // start countdown immediately in single player mode
                     }
                 });
 

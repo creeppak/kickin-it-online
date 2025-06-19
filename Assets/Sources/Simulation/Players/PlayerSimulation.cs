@@ -30,6 +30,7 @@ namespace KickinIt.Simulation.Player
         public float PushCooldownNormalized => _pushForce.PushCooldownNormalized;
 
         public ReadOnlyReactiveProperty<Color> Color => _playerColor.MainColor;
+        public bool IsHost => NetworkObject.HasStateAuthority;
 
         public Observable<IPlayerSimulation> OnHealthDown => _playerHealth.OnHealthDown
             .Select(_ => this as IPlayerSimulation);
@@ -37,7 +38,7 @@ namespace KickinIt.Simulation.Player
         public Observable<IPlayerSimulation> OnHealthOver => _playerHealth.OnHealthOver
             .Select(_ => this as IPlayerSimulation);
 
-        public bool IsReady => _playerReadinessSystem.IsReady;
+        public ReadOnlyReactiveProperty<bool> IsReady => _playerReadinessSystem.IsReady;
         public string PlayerName => _fancyNameProvider.GetName(_playerRef.AsIndex - 1);
         public int PlayerIndex => _playerRef.AsIndex - 1;
         public int HealthPoints => _playerHealth.HealthPoints;

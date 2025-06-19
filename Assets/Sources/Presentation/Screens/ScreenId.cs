@@ -9,5 +9,6 @@
         AwaitingConnectionScreen = 4,
         HUD = 5,
         CountdownScreen = 6,
+        AwaitingReadinessScreen = 7,
     }
 }

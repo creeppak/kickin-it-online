@@ -5,7 +5,7 @@ namespace KickinIt.Simulation
 {
     public interface IPlayer
     {
-        public bool IsReady { get; }
+        public ReadOnlyReactiveProperty<bool> IsReady { get; }
         public string PlayerName { get; }
         public int PlayerIndex { get; }
         public int HealthPoints { get; }
@@ -18,5 +18,6 @@ namespace KickinIt.Simulation
         public Observable<IPlayer> OnHealthOver { get; }
         
         public ReadOnlyReactiveProperty<Color> Color { get; }
+        bool IsHost { get; }
     }
 }

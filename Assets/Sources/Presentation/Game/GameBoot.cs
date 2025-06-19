@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using KickinIt.Presentation.Game.GameStates;
 using KickinIt.Presentation.Screens;
+using KickinIt.Simulation;
+using R3;
 using UnityEngine;
 using VContainer.Unity;
 
@@ -15,6 +17,8 @@ namespace KickinIt.Presentation.Match
         private readonly IScreenManager _screenManager;
         private readonly ScreenId _initialScreen;
         private readonly IAppStateManager _appStateManager;
+        
+        private DisposableBag _disposables;
 
         public GameBoot(ScreenId initialScreen, GamePresenter presenter, IScreenManager screenManager, IAppStateManager appStateManager)
         {
@@ -38,11 +42,24 @@ namespace KickinIt.Presentation.Match
                 await _appStateManager.ChangeState(AppStateId.Metagame);
                 return;
             }
+            
+            var simulation = _presenter.Simulation;
+                    
+            simulation.Phase
+                .Where(phase => phase == SimulationPhase.WaitingForPlayers)
+                .Subscribe(_ => _screenManager.ChangeScreen(ScreenId.AwaitingReadinessScreen))
+                .AddTo(ref _disposables);
+                    
+            simulation.Phase
+                .Where(phase => phase == SimulationPhase.Countdown)
+                .Subscribe(_ => _screenManager.ChangeScreen(ScreenId.CountdownScreen))
+                .AddTo(ref _disposables);
         }
 
         public async ValueTask DisposeAsync()
         {
             await _presenter.TerminateSimulation();
+            _disposables.Dispose();
         }
     }
 }

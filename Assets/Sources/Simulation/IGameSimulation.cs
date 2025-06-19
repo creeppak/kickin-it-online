@@ -13,5 +13,9 @@ namespace KickinIt.Simulation
         [CanBeNull] IPlayer GetPlayer(int index);
         string SessionCode { get; }
         UniTask EnsureLocalPlayerInitialized();
+        int LocalPlayerIndex { get; }
+        void StartGame();
+        ReadOnlyReactiveProperty<int> PlayerCount { get; }
+        int PlayerReadyCount { get; }
     }
 }

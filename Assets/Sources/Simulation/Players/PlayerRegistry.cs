@@ -18,6 +18,7 @@ namespace KickinIt.Simulation.Player
         private NetworkArray<NetworkId> _objectIds { get; }
         
         private readonly IPlayerSimulation[] _playersCache = new IPlayerSimulation[MaxPlayers];
+        private readonly ReactiveProperty<int> _playerCountProperty = new();
 
         public IEnumerable<NetworkObject> AllPlayers
         {
@@ -34,19 +35,15 @@ namespace KickinIt.Simulation.Player
                 }
             }
         }
+        
+        public ReadOnlyReactiveProperty<int> PlayerCount => _playerCountProperty;
 
-        public int PlayerCount
+        public override void Spawned()
         {
-            get
-            {
-                var count = 0;
-                for (int i = 0; i < _refs.Length; i++)
-                {
-                    if (_refs.Get(i) == default) continue;
-                    count++;
-                }
-                return count;
-            }
+            Observable
+                .EveryValueChanged(this, registry => registry.PlayerCountInternal)
+                .Subscribe(value => _playerCountProperty.Value = value)
+                .AddTo(this);
         }
 
         public IEnumerable<PlayerRef> EnumerateConnectedPlayerRefs()
@@ -140,6 +137,17 @@ namespace KickinIt.Simulation.Player
             return result;
         }
 
+        public IEnumerable<IPlayerSimulation> EnumerateAllPlayers()
+        {
+            for (int i = 0; i < _refs.Length; i++)
+            {
+                if (_refs.Get(i) == default) continue;
+
+                var player = GetPlayer(_refs.Get(i));
+                yield return player;
+            }
+        }
+
         public bool HasPlayer(PlayerRef playerRef)
         {
             for (int i = 0; i < _refs.Length; i++)
@@ -148,6 +156,20 @@ namespace KickinIt.Simulation.Player
             }
             
             return false;
+        }
+
+        private int PlayerCountInternal
+        {
+            get
+            {
+                var count = 0;
+                for (int i = 0; i < _refs.Length; i++)
+                {
+                    if (_refs.Get(i) == default) continue;
+                    count++;
+                }
+                return count;
+            }
         }
 
         private void ResetCache()
