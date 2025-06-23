@@ -7,7 +7,6 @@ namespace KickinIt.Simulation.Balls
     internal class Ball : NetworkBehaviour
     {
         private BallMovement _ballMovement;
-        private BallTrail _ballTrail;
         private BallBody _ballBody;
 
         public float CurrentMaxSpeed => _ballMovement.CurrentMaxSpeed;
