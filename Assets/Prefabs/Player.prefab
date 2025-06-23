@@ -230,7 +230,7 @@ MonoBehaviour:
           m_DissipationRate: 0
           m_RawSignal: {fileID: 11400000, guid: bcf6524ce6451f34cb7106d0c00da9a5,
             type: 2}
-          m_AmplitudeGain: 0.4
+          m_AmplitudeGain: 0.3
           m_FrequencyGain: 0.5
           m_RepeatMode: 0
           m_Randomize: 1
@@ -337,8 +337,8 @@ MonoBehaviour:
         TargetAudioSource: {fileID: 367695546310127039}
         Mode: 0
         RandomSfx: []
-        MinVolume: 1
-        MaxVolume: 1
+        MinVolume: 0.66
+        MaxVolume: 0.66
         MinPitch: 0.95
         MaxPitch: 1.05
         SfxAudioMixerGroup: {fileID: 0}
@@ -1267,10 +1267,10 @@ MonoBehaviour:
         TargetAudioSource: {fileID: 7847980123841333049}
         Mode: 0
         RandomSfx: []
-        MinVolume: 1
-        MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinVolume: 0.8
+        MaxVolume: 0.8
+        MinPitch: 0.7
+        MaxPitch: 0.7
         SfxAudioMixerGroup: {fileID: 0}
 --- !u!1 &4078200387695647888
 GameObject:
