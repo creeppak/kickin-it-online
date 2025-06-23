@@ -1,4 +1,5 @@
 using Fusion;
+using R3;
 using UnityEngine;
 
 namespace KickinIt.Simulation.Balls
@@ -15,11 +16,25 @@ namespace KickinIt.Simulation.Balls
         [SerializeField, Sirenix.OdinInspector.ReadOnly]
         private float debugSpeed;
         
+        private ReactiveProperty<int> _maxSpeedStepProperty = new(0);
+        
         [Networked] private float MaxSpeedNetworked { get; set; }
-        [Networked] private int MaxSpeedStep { get; set; }
+        [Networked] private int MaxSpeedStepNetworked { get; set; }
+
+        public int MaxSpeedStep
+        {
+            get => MaxSpeedStepNetworked;
+            private set
+            {
+                MaxSpeedStepNetworked = value;
+                _maxSpeedStepProperty.OnNext(value);
+            }
+        }
         
         public float CurrentMaxSpeed => MaxSpeedNetworked;
         public Vector3 Velocity => rigidBody.velocity;
+        
+        public Observable<int> MaxSpeedStepObservable => _maxSpeedStepProperty;
 
         public override void Spawned() // use INetworkInitializable if you need dependencies
         {
@@ -52,6 +67,14 @@ namespace KickinIt.Simulation.Balls
 #if UNITY_EDITOR
             debugSpeed = rigidBody.velocity.magnitude;      
 #endif
+        }
+
+        public override void Render()
+        {
+            if (_maxSpeedStepProperty.CurrentValue != MaxSpeedStepNetworked) // update observables on clients also
+            {
+                _maxSpeedStepProperty.Value = MaxSpeedStepNetworked;
+            }
         }
 
         public void Push(Vector3 velocity)
