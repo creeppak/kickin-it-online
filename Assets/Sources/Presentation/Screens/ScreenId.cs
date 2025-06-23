@@ -10,5 +10,6 @@
         HUD = 5,
         CountdownScreen = 6,
         AwaitingReadinessScreen = 7,
+        GameOverScreen = 8,
     }
 }

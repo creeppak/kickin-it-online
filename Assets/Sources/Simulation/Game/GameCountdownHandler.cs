@@ -23,6 +23,7 @@ namespace KickinIt.Simulation.Game
         public void Initialize()
         {
             _gameSimulation.Countdown
+                .Skip(1) // skipping initializing value (BehaviourSubject)
                 .Subscribe(_ => onCountdown.Invoke())
                 .AddTo(this);
 

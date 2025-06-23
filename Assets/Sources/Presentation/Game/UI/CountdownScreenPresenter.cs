@@ -36,13 +36,6 @@ namespace KickinIt.Presentation.Match
                     tickAnimation.Play();
                 })
                 .AddTo(this);
-
-            // switch to HUD when game starts
-            _simulation.Phase
-                .Where(phase => phase == SimulationPhase.InProgress)
-                .Take(1)
-                .Subscribe(_ => _screenManager.ChangeScreen(ScreenId.HUD))
-                .AddTo(this);
         }
     }
 }

@@ -54,12 +54,22 @@ namespace KickinIt.Presentation.Match
                 .Where(phase => phase == SimulationPhase.Countdown)
                 .Subscribe(_ => _screenManager.ChangeScreen(ScreenId.CountdownScreen))
                 .AddTo(ref _disposables);
+                    
+            simulation.Phase
+                .Where(phase => phase == SimulationPhase.InProgress)
+                .Subscribe(_ => _screenManager.ChangeScreen(ScreenId.HUD))
+                .AddTo(ref _disposables);
+                    
+            simulation.Phase
+                .Where(phase => phase == SimulationPhase.Finished)
+                .Subscribe(_ => _screenManager.ChangeScreen(ScreenId.GameOverScreen))
+                .AddTo(ref _disposables);
         }
 
         public async ValueTask DisposeAsync()
         {
-            await _presenter.TerminateSimulation();
             _disposables.Dispose();
+            await _presenter.TerminateSimulation();
         }
     }
 }

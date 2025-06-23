@@ -37,7 +37,7 @@ namespace KickinIt.Simulation.Player
 
         public void Dispose()
         {
-            _playerTrack.SetupForNoPlayer();
+            _playerTrack.ResetTrack();
             _playerCamera.DeactivateCamera();
             _disposableBag.Dispose();
         }

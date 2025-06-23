@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using KickinIt.Presentation.Game.GameStates;
 using KickinIt.Presentation.Screens;
 using KickinIt.Simulation;
@@ -6,7 +7,6 @@ using R3;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
-using Object = UnityEngine.Object;
 
 namespace KickinIt.Presentation.Match
 {
@@ -19,6 +19,7 @@ namespace KickinIt.Presentation.Match
         private IAppStateManager _appStateManager;
         private IGameSimulation _simulation;
         private Func<IPlayer, HudPlayerPresenter, RectTransform, HudPlayerPresenter> _playerGuiFactory;
+        private readonly List<HudPlayerPresenter> _playerGuis = new();
 
         [Inject]
         private void Configure(
@@ -49,12 +50,16 @@ namespace KickinIt.Presentation.Match
                 if (player == null) continue;
 
                 var playerGui = _playerGuiFactory(player, playerGuiPrefab, playerInfoContainer);
+                _playerGuis.Add(playerGui);
             }
         }
 
         protected override void OnScreenDispose()
         {
-            base.OnScreenDispose();
+            foreach (var playerGui in _playerGuis)
+            {
+                Destroy(playerGui.gameObject);
+            }
         }
     }
 }

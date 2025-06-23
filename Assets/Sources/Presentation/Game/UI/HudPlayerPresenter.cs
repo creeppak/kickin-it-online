@@ -14,10 +14,12 @@ namespace KickinIt.Presentation.Match
         [SerializeField] private Image pushCooldown;
         
         private IPlayer _player;
+        private ISimulationProvider _simulationProvider;
 
         [Inject]
-        private void Configure(IPlayer player)
+        private void Configure(IPlayer player, ISimulationProvider simulationProvider)
         {
+            _simulationProvider = simulationProvider;
             _player = player;
         }
 
@@ -36,6 +38,11 @@ namespace KickinIt.Presentation.Match
 
         private void Update()
         {
+            if (!_simulationProvider.Simulation.Active)
+            {
+                return;
+            }
+            
             pushCooldown.fillAmount = _player.PushCooldownNormalized; // timers update each frame
         }
 

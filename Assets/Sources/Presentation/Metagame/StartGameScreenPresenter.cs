@@ -13,6 +13,8 @@ namespace KickinIt.Presentation.Metagame
         [SerializeField] private Button hostButton;
         [SerializeField] private Button joinButton;
         [SerializeField] private Button practiceButton;
+        [SerializeField] private Button quitButton;
+        [SerializeField] private GameObject hostRestrictionsNotice;
         
         private IScreenManager _screenManager;
         private IAppStateManager _appStateManager;
@@ -26,7 +28,14 @@ namespace KickinIt.Presentation.Metagame
 
         protected override void OnScreenLoaded()
         {
-            hostButton.interactable = Application.platform != RuntimePlatform.WebGLPlayer; // hosting is disabled for WebGL
+            hostButton.interactable = Application.platform != RuntimePlatform.WebGLPlayer; // online is disabled for WebGL
+            joinButton.interactable = Application.platform != RuntimePlatform.WebGLPlayer; // online is disabled for WebGL
+            
+            
+            if (hostRestrictionsNotice)
+            {
+                hostRestrictionsNotice.gameObject.SetActive(Application.platform == RuntimePlatform.WebGLPlayer);
+            }
             
             hostButton.OnClickAsObservable()
                 .SelectAwait(async (_, _) =>
@@ -66,6 +75,20 @@ namespace KickinIt.Presentation.Metagame
                 .IgnoreOnErrorResume()
                 .Subscribe()
                 .AddTo(this);
+
+            if (Application.platform == RuntimePlatform.WebGLPlayer)
+            {
+                quitButton.gameObject.SetActive(false);
+            }
+            else
+            {
+                quitButton.OnClickAsObservable()
+                    .Subscribe(_ =>
+                    {
+                        Application.Quit();
+                    })
+                    .AddTo(this);
+            }
         }
     }
 }

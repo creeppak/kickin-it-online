@@ -29,6 +29,14 @@ namespace KickinIt.Simulation.Track
             virtualCamera.gameObject.SetActive(false);
         }
 
+        public void ResetTrack()
+        {
+            if (noPlayerSetup && playerSetup)
+            {
+                SetupForNoPlayer();
+            }
+        }
+
         public Vector3 GetWorldPosition(float x)
         {
             var time = Mathf.InverseLerp(MinPosition, MaxPosition, x);

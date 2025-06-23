@@ -28,7 +28,15 @@ namespace KickinIt.Simulation.Game
         internal async UniTask ShutdownSession()
         {
             // var sceneIndex = _networkRunner.SceneManager.GetSceneRef(gameObject).AsIndex;
-            await _networkRunner.UnloadScene(GameSimulationConstants.SimulationSceneName);
+            if (_networkRunner.IsSceneAuthority)
+            {
+                await _networkRunner.UnloadScene(GameSimulationConstants.SimulationSceneName);
+            }
+            else
+            {
+                await SceneManager.UnloadSceneAsync(GameSimulationConstants.SimulationSceneName);
+            }
+            
             await _networkRunner.Shutdown();
             // await SceneManager.UnloadSceneAsync(sceneIndex);
         }

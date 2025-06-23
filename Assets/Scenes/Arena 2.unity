@@ -2951,6 +2951,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   postGoalDelay: 3
   stateDebug: 0
+  countdownSteps: 3
+  countdownStepDuration: 1
 --- !u!114 &334523412
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7176,7 +7178,7 @@ MonoBehaviour:
   DebugActive: 0
   FeedbacksList:
   - rid: 7416853920173785089
-  - rid: 7416853920173785094
+  - rid: 7416854031307374592
   KeepPlayModeChanges: 0
   PerformanceMode: 0
   StopFeedbacksOnDisable: 0
@@ -7309,11 +7311,11 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 7416853920173785094
+    - rid: 7416854031307374592
       type: {class: MMF_Bloom_URP, ns: MoreMountains.FeedbacksForThirdParty, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: -1006402663
+        UniqueID: -1743958652
         Label: Bloom URP
         ChannelMode: 0
         Channel: 0
@@ -7383,7 +7385,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 730344298}
         DebugActive: 0
-        ShakeDuration: 0.2
+        ShakeDuration: 1.2
         ResetShakerValuesAfterShake: 1
         ResetTargetValuesAfterShake: 1
         RelativeValues: 1
@@ -7392,7 +7394,7 @@ MonoBehaviour:
           m_Curve:
           - serializedVersion: 3
             time: 0
-            value: 0
+            value: 0.5
             inSlope: 0
             outSlope: 0
             tangentMode: 0
@@ -7400,7 +7402,7 @@ MonoBehaviour:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.5
+            time: 0.05
             value: 1
             inSlope: 0
             outSlope: 0
@@ -7421,7 +7423,7 @@ MonoBehaviour:
           m_PostInfinity: 2
           m_RotationOrder: 4
         RemapIntensityZero: 0
-        RemapIntensityOne: 1
+        RemapIntensityOne: 1.5
         ShakeThreshold:
           serializedVersion: 2
           m_Curve:
@@ -9114,7 +9116,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 891446790}
         DebugActive: 0
-        ShakeDuration: 0.2
+        ShakeDuration: 0.8
         ResetShakerValuesAfterShake: 1
         ResetTargetValuesAfterShake: 1
         RelativeValues: 1
@@ -9123,7 +9125,7 @@ MonoBehaviour:
           m_Curve:
           - serializedVersion: 3
             time: 0
-            value: 0
+            value: 0.5
             inSlope: 0
             outSlope: 0
             tangentMode: 0
@@ -9131,7 +9133,7 @@ MonoBehaviour:
             inWeight: 0
             outWeight: 0
           - serializedVersion: 3
-            time: 0.5
+            time: 0.05
             value: 1
             inSlope: 0
             outSlope: 0
@@ -9152,7 +9154,7 @@ MonoBehaviour:
           m_PostInfinity: 2
           m_RotationOrder: 4
         RemapIntensityZero: 0
-        RemapIntensityOne: 0.5
+        RemapIntensityOne: 1
         ShakeThreshold:
           serializedVersion: 2
           m_Curve:
@@ -13741,12 +13743,13 @@ AudioSource:
   m_GameObject: {fileID: 1409973946}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -6241291165153052880, guid: 72d09630073f4f3d299bf6ca3fdd4c0c,
+    type: 2}
   m_audioClip: {fileID: 8300000, guid: c34f9b80e71995315b6eb0db797ce618, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.6
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

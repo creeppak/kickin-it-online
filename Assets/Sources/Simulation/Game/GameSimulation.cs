@@ -40,11 +40,8 @@ namespace KickinIt.Simulation.Game
 
         private DisposableBag _currentStateBag;
         
-        private const int CountdownSteps = 3;
-        private const float CountdownStepDuration = 1f;
-        
         private readonly ReactiveProperty<SimulationPhase> _phase = new(SimulationPhase.Inactive);
-        private readonly BehaviorSubject<int> _countdown = new(CountdownSteps);
+        private BehaviorSubject<int> _countdown;
 
         private SimulationArgs _simulationArgs;
         private GameNetwork _network;
@@ -57,6 +54,9 @@ namespace KickinIt.Simulation.Game
         [SerializeField] private float postGoalDelay = 3f;
         // ReSharper disable once NotAccessedField.Local
         [SerializeField] [Sirenix.OdinInspector.ReadOnly] private State stateDebug;
+        
+        [SerializeField] private int countdownSteps = 3;
+        [SerializeField] private float countdownStepDuration = 1f;
 
         [Networked] private Trigger LastFiredTrigger { get; set; }
 
@@ -64,7 +64,8 @@ namespace KickinIt.Simulation.Game
         public Observable<int> Countdown => _countdown;
         public string SessionCode => _simulationArgs.sessionCode;
         public ReadOnlyReactiveProperty<int> PlayerCount => _playerManager.PlayerCount;
-        public int PlayerReadyCount => _playerManager.PlayerReadyCount; 
+        public int PlayerReadyCount => _playerManager.PlayerReadyCount;
+        public bool Active => Runner && Runner.IsRunning;
 
         [Inject]
         private void Configure(SimulationArgs simulationArgs, GameNetwork network, PlayerManager playerManager,
@@ -78,6 +79,7 @@ namespace KickinIt.Simulation.Game
 
         private void Awake()
         {
+            _countdown = new BehaviorSubject<int>(countdownSteps);
             _stateMachine = new StateMachine<State, Trigger>(State.Inactive);
             ConfigureStateMachine();
         }
@@ -118,11 +120,25 @@ namespace KickinIt.Simulation.Game
             _stateMachine.Fire(Trigger.StartCountdown);
         }
 
+        public void RestartGame() => _stateMachine.Fire(Trigger.TryAgain);
+
         public IPlayer GetPlayer(int index)
         {
             return _playerManager.TryGetPlayer(PlayerRef.FromIndex(index), out IPlayerSimulation playerSimulation) 
                 ? playerSimulation 
                 : null;
+        }
+        
+        public IPlayer DetermineWinner()
+        {
+            var winners = _playerManager.CollectAllPlayers().Where(simulation => simulation.HealthPoints > 0).ToArray();
+
+            if (winners.Length != 1)
+            {
+                throw new Exception("There should be exactly one winner, but found: " + winners.Length);
+            }
+            
+            return winners[0];
         }
         
         public UniTask EnsureLocalPlayerInitialized()
@@ -163,9 +179,9 @@ namespace KickinIt.Simulation.Game
                 .OnEntry(() =>
                 {
                     // todo: utilize Photon's TickTimer for better accuracy
-                    Observable.Return(CountdownSteps) // emits initial value immediately
-                        .Concat(Observable.Interval(TimeSpan.FromSeconds(CountdownStepDuration))
-                            .Scan(CountdownSteps, (count, _) => count - 1))
+                    Observable.Return(countdownSteps) // emits initial value immediately
+                        .Concat(Observable.Interval(TimeSpan.FromSeconds(countdownStepDuration))
+                            .Scan(countdownSteps, (count, _) => count - 1))
                         .TakeWhile(count => count > 0)
                         .Subscribe(
                             onNext: count => _countdown.OnNext(count),

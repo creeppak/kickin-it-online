@@ -17,5 +17,8 @@ namespace KickinIt.Simulation
         void StartGame();
         ReadOnlyReactiveProperty<int> PlayerCount { get; }
         int PlayerReadyCount { get; }
+        bool Active { get; }
+        void RestartGame();
+        IPlayer DetermineWinner();
     }
 }

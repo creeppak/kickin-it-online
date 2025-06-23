@@ -5092,7 +5092,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 6472267228939319187}
-  startMaxSpeed: 12
+  startMaxSpeed: 8
   spawnSpeed: 2.5
   acceleration: 3
   deceleration: 0.1
