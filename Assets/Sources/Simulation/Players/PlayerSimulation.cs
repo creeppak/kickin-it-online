@@ -16,6 +16,7 @@ namespace KickinIt.Simulation.Player
         private readonly PlayerBallBouncer _pushForce;
         
         private PlayerRef _playerRef;
+        private PlayerTrack _playerTrack;
 
         public NetworkObject NetworkObject { get; }
         
@@ -50,8 +51,10 @@ namespace KickinIt.Simulation.Player
             FancyNameProvider fancyNameProvider,
             PlayerRef playerRef,
             PlayerColor playerColor,
-            PlayerBallBouncer pushForce)
+            PlayerBallBouncer pushForce,
+            PlayerTrack playerTrack)
         {
+            _playerTrack = playerTrack;
             _pushForce = pushForce;
             _playerColor = playerColor;
             _playerRef = playerRef;
@@ -65,6 +68,7 @@ namespace KickinIt.Simulation.Player
 
         public void ResetPlayer()
         {
+            _playerTrack.ClearPlayerDead();
             _playerHealth.ResetHealth();
             _playerHealth.SetImmortal(true); // all players are immortal at the start
         }

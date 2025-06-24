@@ -1,21 +1,18 @@
-﻿using System;
-using Cinemachine;
+﻿using Cinemachine;
 using KickinIt.Simulation.Gates;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.Splines;
 
 namespace KickinIt.Simulation.Track
 {
     internal class PlayerTrack : MonoBehaviour
     {
-        [FormerlySerializedAs("_splineContainer")] 
         [SerializeField] private SplineContainer splineContainer;
-        [FormerlySerializedAs("_virtualCamera")] 
         [SerializeField] private CinemachineVirtualCamera virtualCamera;
         [SerializeField] private GatesTrigger gatesTrigger;
         [SerializeField] private GameObject playerSetup;
         [SerializeField] private GameObject noPlayerSetup;
+        [SerializeField] private GameObject playerDeadSetup;
         
         public float TrackLength => splineContainer[0].GetLength();
         public float MinPosition => -TrackLength / 2f;
@@ -29,11 +26,19 @@ namespace KickinIt.Simulation.Track
             virtualCamera.gameObject.SetActive(false);
         }
 
-        public void ResetTrack()
+        public void ClearPlayer()
         {
             if (noPlayerSetup && playerSetup)
             {
-                SetupForNoPlayer();
+                SetupPlayerAvailable(false);
+            }
+        }
+
+        public void ClearPlayerDead()
+        {
+            if (playerDeadSetup)
+            {
+                SetupPlayerDead(false);
             }
         }
 
@@ -57,16 +62,15 @@ namespace KickinIt.Simulation.Track
             return lookAtSplineForward * rotateLeft;
         }
 
-        public void SetupForPlayer()
+        public void SetupPlayerAvailable(bool playerAvailable)
         {
-            playerSetup.SetActive(true);
-            noPlayerSetup.SetActive(false);
+            playerSetup.SetActive(playerAvailable);
+            noPlayerSetup.SetActive(!playerAvailable);
         }
 
-        public void SetupForNoPlayer()
+        public void SetupPlayerDead(bool playerDead)
         {
-            playerSetup.SetActive(false);
-            noPlayerSetup.SetActive(true);
+            playerDeadSetup.SetActive(playerDead);
         }
 
         public float GetNormalizedPosition(float x)

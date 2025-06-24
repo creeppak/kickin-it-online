@@ -18,6 +18,7 @@ namespace KickinIt.Simulation.Player
         [SerializeField] private PlayerColor color;
         [SerializeField] private PlayerBallBouncer pushForce;
         [SerializeField] private new PlayerAnimation animation;
+        [SerializeField] private PlayerDeathHandler deathHandler;
 
         private void OnValidate()
         {
@@ -40,6 +41,7 @@ namespace KickinIt.Simulation.Player
             builder.RegisterComponent(color);
             builder.RegisterComponent(pushForce);
             builder.RegisterComponent(animation);
+            builder.RegisterComponent(deathHandler);
             
             builder.Register(ResolvePlayerTrack, Lifetime.Singleton);
             

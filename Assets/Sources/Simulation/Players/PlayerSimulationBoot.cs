@@ -22,7 +22,7 @@ namespace KickinIt.Simulation.Player
 
         public void Start()
         {
-            _playerTrack.SetupForPlayer();
+            _playerTrack.SetupPlayerAvailable(true);
             
             _gameSimulation.Phase
                 .Subscribe(onNext: phase =>
@@ -37,7 +37,7 @@ namespace KickinIt.Simulation.Player
 
         public void Dispose()
         {
-            _playerTrack.ResetTrack();
+            _playerTrack.ClearPlayer();
             _playerCamera.DeactivateCamera();
             _disposableBag.Dispose();
         }

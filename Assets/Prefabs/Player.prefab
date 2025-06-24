@@ -361,6 +361,7 @@ GameObject:
   - component: {fileID: 6038076461296453303}
   - component: {fileID: 7819793380293119688}
   - component: {fileID: 2002068189566765609}
+  - component: {fileID: 6976476121763905893}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -448,6 +449,7 @@ MonoBehaviour:
   color: {fileID: 7819793380293119688}
   pushForce: {fileID: 8303178290714536721}
   animation: {fileID: 2002068189566765609}
+  deathHandler: {fileID: 6976476121763905893}
 --- !u!114 &3126717706213358497
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -658,6 +660,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 4755036968103354107}
+--- !u!114 &6976476121763905893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1890267725027732791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 853e960807324b0283878c1e4616cf0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2276268721441833383
 GameObject:
   m_ObjectHideFlags: 0

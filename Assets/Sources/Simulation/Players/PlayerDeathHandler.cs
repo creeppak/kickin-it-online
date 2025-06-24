@@ -1,4 +1,5 @@
 ﻿using System;
+using KickinIt.Simulation.Track;
 using R3;
 using UnityEngine;
 using VContainer;
@@ -8,14 +9,16 @@ namespace KickinIt.Simulation.Player
     internal class PlayerDeathHandler : MonoBehaviour
     {
         private PlayerHealth _playerHealth;
+        private PlayerTrack _playerTrack;
 
         [Inject]
-        private void Configure(PlayerHealth playerHealth)
+        private void Configure(PlayerHealth playerHealth, PlayerTrack playerTrack)
         {
+            _playerTrack = playerTrack;
             _playerHealth = playerHealth;
         }
 
-        private void Awake()
+        private void Start()
         {
             _playerHealth.OnHealthOver
                 .Subscribe(_ => HandleDeath())
@@ -24,7 +27,7 @@ namespace KickinIt.Simulation.Player
 
         private void HandleDeath()
         {
-            throw new NotImplementedException();
+            _playerTrack.SetupPlayerDead(true);
         }
     }
 }

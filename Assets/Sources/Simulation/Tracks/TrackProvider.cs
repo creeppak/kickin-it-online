@@ -15,7 +15,8 @@ namespace KickinIt.Simulation.Track
         {
             foreach (var track in tracks)
             {
-                track.SetupForNoPlayer();
+                track.ClearPlayerDead();
+                track.ClearPlayer();
             }
         }
     }
