@@ -5,7 +5,7 @@ This repository is a demonstration of a scalable multiplayer game architecture u
 **Please note:** The demo is still a work-in-progress and is not fully functional.
 
 ![Metagame Screenshot](Markdown/main-menu.png)
-![New arena WIP](Markdown/homeland.webm)
+![New arena WIP](Markdown/homeland.gif)
 
 ## Overview
 
