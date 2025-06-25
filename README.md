@@ -1,4 +1,4 @@
-﻿# Kickin' It! - Online Pong Demo Game (WIP)
+﻿# Skyline - Realtime Multiplayer Pong Game (WIP)
 
 This repository is a demonstration of a scalable multiplayer game architecture using Unity & Photon Fusion 2.
 
