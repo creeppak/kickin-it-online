@@ -32,30 +32,22 @@ namespace KickinIt.Simulation.Game
 
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterComponent(simulation)
-                .As<IGameSimulation>();
-
-            builder.Register(ResolveGameNetwork, Lifetime.Singleton);
+            builder.RegisterEntryPoint<NetworkedInitializationManager<IGameInitializable>>();
+            builder.RegisterEntryPointExceptionHandler(Debug.LogException);
             
+            builder.RegisterComponent(simulation).As<IGameSimulation>();
+            builder.Register(ResolveGameNetwork, Lifetime.Singleton);
             builder.RegisterComponent(playerManager).AsImplementedInterfaces().AsSelf();
             builder.RegisterComponent(playerRegistry);
             builder.RegisterComponent(trackProvider);
             builder.RegisterComponent(ballSpawner);
             builder.Register<BallFactory>(Lifetime.Singleton);
             builder.RegisterComponent(gameCountdownHandler)
-                .AsSelf()
-                .AsImplementedInterfaces();
-            
+                .AsImplementedInterfaces()
+                .AsSelf();
             builder.Register(_ => gameObject.scene.GetPhysicsScene(), Lifetime.Singleton);
-            
             builder.Register<InputCollector>(Lifetime.Singleton);
-
-            builder.RegisterComponent(kartInputWriter)
-                .As<IInputWriter>();
-
-            builder.RegisterEntryPoint<NetworkedInitializationManager<IGameInitializable>>();
-            
-            builder.RegisterEntryPointExceptionHandler(Debug.LogException);
+            builder.RegisterComponent(kartInputWriter).As<IInputWriter>();
             GameNetwork ResolveGameNetwork(IObjectResolver resolver)
             {
                 var runner = resolver.Resolve<NetworkRunner>();

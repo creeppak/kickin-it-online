@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
 
-namespace KickinIt.Presentation.Metagame
+namespace KickinIt.Presentation.Metagame.Presenters
 {
     public sealed class JoinServerScreenPresenter : GameScreenPresenter
     {

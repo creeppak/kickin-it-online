@@ -14,12 +14,11 @@ namespace KickinIt.Presentation.Metagame
 
         protected override void ConfigureGameStateScope(IContainerBuilder builder)
         {
-            builder.RegisterGameScreens(screenPrototypes, screenNester);
-            builder.Register<MetaGameBoot>(Lifetime.Singleton);
+            builder.RegisterEntryPointExceptionHandler(Debug.LogException);
             builder.RegisterEntryPoint<MetaGameBoot>()
                 .WithParameter(initialScreenId);
             
-            builder.RegisterEntryPointExceptionHandler(Debug.LogException);
+            builder.RegisterGameScreens(screenPrototypes, screenNester);
         }
     }
 }

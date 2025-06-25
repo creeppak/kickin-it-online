@@ -31,8 +31,15 @@ namespace KickinIt.Simulation.Player
 
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.Register<IPlayerSimulation, PlayerSimulation>(Lifetime.Singleton); // facade
+            builder.UseEntryPoints(pointsBuilder =>
+            {
+                pointsBuilder.Add<PlayerSimulationBoot>();
+                pointsBuilder.Add<NetworkedInitializationManager<IPlayerInitializable>>();
+            });
             
+            builder.RegisterEntryPointExceptionHandler(Debug.LogException);
+            
+            builder.Register<IPlayerSimulation, PlayerSimulation>(Lifetime.Singleton); // facade
             builder.RegisterComponent(networkObject);
             builder.RegisterComponent(movement);
             builder.RegisterComponent(health).AsImplementedInterfaces().AsSelf();
@@ -42,16 +49,7 @@ namespace KickinIt.Simulation.Player
             builder.RegisterComponent(pushForce);
             builder.RegisterComponent(animation);
             builder.RegisterComponent(deathHandler);
-            
             builder.Register(ResolvePlayerTrack, Lifetime.Singleton);
-            
-            builder.UseEntryPoints(pointsBuilder =>
-            {
-                pointsBuilder.Add<PlayerSimulationBoot>();
-                pointsBuilder.Add<NetworkedInitializationManager<IPlayerInitializable>>();
-            });
-            
-            builder.RegisterEntryPointExceptionHandler(Debug.LogException);
         }
 
         private PlayerTrack ResolvePlayerTrack(IObjectResolver resolver)

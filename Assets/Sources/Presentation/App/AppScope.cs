@@ -10,19 +10,27 @@ using VContainer.Unity;
 
 namespace KickinIt.Presentation.Game
 {
-    public class AppScope : LifetimeScope
+    public class AppScope : LifetimeScope // loaded automatically as global scope
     {
         [SerializeField] private AppStateSceneCollection sceneGameStates;
         [SerializeField] private NetworkRunner networkRunnerPrefab;
         
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.Register<FancyNameProvider>(Lifetime.Singleton);
+            builder.UseEntryPoints(pointsBuilder =>
+            {
+                pointsBuilder.Add<BackgroundWorkerKeeper>();
+                pointsBuilder.Add<AppBoot>();
+            });
             
+            builder.RegisterEntryPointExceptionHandler(OnGameBootException);
+            
+            builder.Register<AsyncDisposingSystem>(Lifetime.Scoped);
+            builder.Register<FancyNameProvider>(Lifetime.Singleton); // demo service
             builder.Register<SimpleAppStateFactory>(Lifetime.Transient);
             builder.Register<SceneAppStateFactory>(Lifetime.Transient)
-                .AsSelf()
-                .As<IHotLoadAppStateProvider>();
+                .As<IHotLoadAppStateProvider>()
+                .AsSelf();
             builder.RegisterInstance<IAppStateSceneProvider>(sceneGameStates);
             builder.Register<IAppStateFactory, MasterAppStateFactory>(Lifetime.Transient);
             builder.Register<IAppStateManager, AppStateManager>(Lifetime.Singleton);
@@ -36,20 +44,7 @@ namespace KickinIt.Presentation.Game
                 builder.Register<BackgroundWorkerProxy>(Lifetime.Singleton)
                     .As<IBackgroundWorker>()
                     .AsSelf();
-
-                builder.Register<BackgroundWorkerKeeper>(Lifetime.Singleton)
-                    .AsSelf();
             }
-            
-            builder.UseEntryPoints(pointsBuilder =>
-            {
-                pointsBuilder.Add<BackgroundWorkerKeeper>();
-                pointsBuilder.Add<AppBoot>();
-            });
-            
-            builder.RegisterEntryPointExceptionHandler(OnGameBootException);
-
-            builder.Register<AsyncDisposingSystem>(Lifetime.Scoped);
         }
 
         private void OnGameBootException(Exception obj)
