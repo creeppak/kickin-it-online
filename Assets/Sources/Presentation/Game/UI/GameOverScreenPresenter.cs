@@ -11,7 +11,9 @@ namespace KickinIt.Presentation.Match
     public class GameOverScreenPresenter : GameScreenPresenter
     {
         [SerializeField] private TMP_Text winnerLabel;
+        [SerializeField] private TMP_Text clientAwaitLabel;
         [SerializeField] private string winnerTextFormat = "{0} is the winner!";
+        [SerializeField] private string noWinnerPlayerName = "Cosmic Entropy";
         [SerializeField] private Button retryButton;
         [SerializeField] private Button quitToMenuButton;
         
@@ -29,12 +31,13 @@ namespace KickinIt.Presentation.Match
         {
             var simulation = _simulationProvider.Simulation;
 
-            // var winnerPlayer = simulation.DetermineWinner(); todo
-            // winnerLabel.text = string.Format(winnerTextFormat, winnerPlayer.PlayerName);
-            
-            winnerLabel.text = "Game Over!";
+            var winnerPlayer = simulation.Winner;
+            Debug.Log($"GameOverScreenPresenter: Winner is {winnerPlayer?.PlayerName}");
+            winnerLabel.text = string.Format(winnerTextFormat, winnerPlayer?.PlayerName ?? noWinnerPlayerName);
 
             var localPlayer = simulation.GetPlayer(simulation.LocalPlayerIndex)!;
+            clientAwaitLabel.gameObject.SetActive(!localPlayer.IsHost);
+            
             if (!localPlayer.IsHost)
             {
                 retryButton.gameObject.SetActive(false);

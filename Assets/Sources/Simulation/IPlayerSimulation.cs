@@ -14,5 +14,7 @@ namespace KickinIt.Simulation
         void ResetPlayer();
         void SetImmortal(bool immortal);
         void InitializePlayer();
+        void SetInputEnabled(bool enabled);
+        void SetMarkedAsWinner(bool markedAsWinner);
     }
 }

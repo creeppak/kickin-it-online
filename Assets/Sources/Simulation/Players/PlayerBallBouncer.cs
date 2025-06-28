@@ -29,6 +29,7 @@ namespace KickinIt.Simulation.Players
         [Networked] private float LastPushTime { get; set; }
         [Networked] private int PushedTimes { get; set; }
         [Networked] private int BallPushedTimes { get; set; }
+        [Networked] private bool InputEnabled { get; set; }
         
         public float PushCooldownNormalized => Mathf.Clamp01((Runner.SimulationTime - LastPushTime) / pushCooldown);
         public Observable<int> Pushed => _pushedSubject;
@@ -46,6 +47,11 @@ namespace KickinIt.Simulation.Players
 
         public override void FixedUpdateNetwork()
         {
+            if (!InputEnabled)
+            {
+                return;
+            }
+            
             if (!GetInput(out KickingItNetworkInput inputData))
             {
                 return;
@@ -78,6 +84,11 @@ namespace KickinIt.Simulation.Players
                 _localBallPushedTimes = BallPushedTimes;
                 ballPushedEvent.Invoke();
             }
+        }
+        
+        public void SetInputEnabled(bool inputEnabled)
+        {
+            InputEnabled = inputEnabled;
         }
 
         private void TriggerPush()

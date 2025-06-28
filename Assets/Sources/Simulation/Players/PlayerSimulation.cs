@@ -17,6 +17,9 @@ namespace KickinIt.Simulation.Player
         
         private PlayerRef _playerRef;
         private PlayerTrack _playerTrack;
+        private PlayerMovement _playerMovement;
+        private PlayerBallBouncer _ballBouncer;
+        private PlayerWinnerMark _winnerMark;
 
         public NetworkObject NetworkObject { get; }
         
@@ -41,7 +44,7 @@ namespace KickinIt.Simulation.Player
 
         public ReadOnlyReactiveProperty<bool> IsReady => _playerReadinessSystem.IsReady;
         public string PlayerName => _fancyNameProvider.GetName(_playerRef.AsIndex - 1);
-        public int PlayerIndex => _playerRef.AsIndex - 1;
+        public int PlayerIndex => _playerRef.AsIndex;
         public int HealthPoints => _playerHealth.HealthPoints;
 
         public PlayerSimulation(
@@ -52,8 +55,14 @@ namespace KickinIt.Simulation.Player
             PlayerRef playerRef,
             PlayerColor playerColor,
             PlayerBallBouncer pushForce,
-            PlayerTrack playerTrack)
+            PlayerTrack playerTrack,
+            PlayerMovement playerMovement,
+            PlayerBallBouncer ballBouncer,
+            PlayerWinnerMark winnerMark)
         {
+            _winnerMark = winnerMark;
+            _ballBouncer = ballBouncer;
+            _playerMovement = playerMovement;
             _playerTrack = playerTrack;
             _pushForce = pushForce;
             _playerColor = playerColor;
@@ -69,8 +78,15 @@ namespace KickinIt.Simulation.Player
         public void ResetPlayer()
         {
             _playerTrack.ClearPlayerDead();
+            
+            if (!NetworkObject.HasStateAuthority)
+            {
+                return; // continue on server only
+            }
+            
             _playerHealth.ResetHealth();
-            _playerHealth.SetImmortal(true); // all players are immortal at the start
+            _playerHealth.SetImmortal(true); // all players are immortal till game tells them otherwise
+            SetInputEnabled(true);
         }
 
         public void SetImmortal(bool immortal) => _playerHealth.SetImmortal(immortal);
@@ -78,6 +94,17 @@ namespace KickinIt.Simulation.Player
         public void InitializePlayer()
         {
             _playerColor.PickRandomColor();
+        }
+
+        public void SetInputEnabled(bool enabled)
+        {
+            _playerMovement.SetInputEnabled(enabled);
+            _ballBouncer.SetInputEnabled(enabled);
+        }
+
+        public void SetMarkedAsWinner(bool markedAsWinner)
+        {
+            _winnerMark.SetMarkedAsWinner(markedAsWinner);
         }
     }
 }

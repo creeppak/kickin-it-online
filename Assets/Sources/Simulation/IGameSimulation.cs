@@ -19,6 +19,6 @@ namespace KickinIt.Simulation
         int PlayerReadyCount { get; }
         bool Active { get; }
         void RestartGame();
-        IPlayer DetermineWinner();
+        [CanBeNull] IPlayer Winner { get; }
     }
 }

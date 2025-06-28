@@ -24,6 +24,7 @@ namespace KickinIt.Simulation.Player
         [Networked] private float VelocityNetworked { get; set; }
         [Networked] private float InputPhaseStartTime { get; set; }
         [Networked] private bool WasAcceleratingLastTick { get; set; }
+        [Networked] private bool InputEnabled { get; set; }
         
         private float InputPhaseTime => Runner.SimulationTime - InputPhaseStartTime;
         
@@ -52,7 +53,7 @@ namespace KickinIt.Simulation.Player
         {
             var input = 0f;
             
-            if (GetInput(out KickingItNetworkInput inputData))
+            if (InputEnabled && GetInput(out KickingItNetworkInput inputData))
             {
                 input = Mathf.Clamp(inputData.movement, -1f, 1f);
             }
@@ -100,6 +101,11 @@ namespace KickinIt.Simulation.Player
             {
                 InputPhaseStartTime = Runner.SimulationTime;
             }
+        }
+        
+        public void SetInputEnabled(bool inputEnabled)
+        {
+            InputEnabled = inputEnabled;
         }
 
         private void UpdatePosition3D()
