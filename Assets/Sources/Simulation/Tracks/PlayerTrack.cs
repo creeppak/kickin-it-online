@@ -9,7 +9,7 @@ namespace KickinIt.Simulation.Track
     {
         [SerializeField] private SplineContainer splineContainer;
         [SerializeField] private CinemachineVirtualCamera virtualCamera;
-        [SerializeField] private GatesTrigger gatesTrigger;
+        [SerializeField] private GoalProcessor goalProcessor;
         [SerializeField] private GameObject playerSetup;
         [SerializeField] private GameObject noPlayerSetup;
         [SerializeField] private GameObject playerDeadSetup;
@@ -18,7 +18,7 @@ namespace KickinIt.Simulation.Track
         public float MinPosition => -TrackLength / 2f;
         public float MaxPosition => TrackLength / 2f;
 
-        public GatesTrigger GatesTrigger => gatesTrigger;
+        public GoalProcessor GoalProcessor => goalProcessor;
         public CinemachineVirtualCamera VirtualCamera => virtualCamera;
 
         private void Awake()

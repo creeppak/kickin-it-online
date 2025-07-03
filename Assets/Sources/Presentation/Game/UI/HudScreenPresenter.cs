@@ -12,6 +12,8 @@ namespace KickinIt.Presentation.Match
 {
     public class HudScreenPresenter : GameScreenPresenter
     {
+        private const int MaxPlayers = 4;
+        
         [SerializeField] private Button quitToMenuButton;
         [SerializeField] private RectTransform playerInfoContainer;
         [SerializeField] private HudPlayerPresenter playerGuiPrefab;
@@ -43,7 +45,7 @@ namespace KickinIt.Presentation.Match
                 .Subscribe()
                 .AddTo(this);
 
-            for (var i = 0; i < 4; i++)
+            for (var i = 1; i < 1 + MaxPlayers; i++)
             {
                 var player = _simulation.GetPlayer(i);
                 

@@ -12,14 +12,13 @@ namespace KickinIt.Presentation.Match
         [SerializeField] private TMP_Text playerName;
         [SerializeField] private TMP_Text healthPoints;
         [SerializeField] private Image pushCooldown;
+        [SerializeField] private Graphic coloringTarget;
         
         private IPlayer _player;
-        private ISimulationProvider _simulationProvider;
 
         [Inject]
-        private void Configure(IPlayer player, ISimulationProvider simulationProvider)
+        private void Configure(IPlayer player)
         {
-            _simulationProvider = simulationProvider;
             _player = player;
         }
 
@@ -36,19 +35,9 @@ namespace KickinIt.Presentation.Match
                 .AddTo(this);
         }
 
-        private void Update()
-        {
-            if (!_simulationProvider.Simulation.Active)
-            {
-                return;
-            }
-            
-            pushCooldown.fillAmount = _player.PushCooldownNormalized; // timers update each frame
-        }
-
         private void UpdateColor(Color color)
         {
-            playerName.color = color;
+            coloringTarget.color = color;
         }
 
         private void UpdateHealth()

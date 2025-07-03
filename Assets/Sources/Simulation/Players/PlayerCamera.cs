@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading;
 using Cinemachine;
+using Cysharp.Threading.Tasks;
 using Fusion;
 using KickinIt.Simulation.Track;
 using UnityEngine;
@@ -9,6 +11,9 @@ namespace KickinIt.Simulation.Player
 {
     internal class PlayerCamera : NetworkBehaviour
     {
+        [SerializeField] private CinemachineVirtualCamera scoreCam;
+        [SerializeField] private float scoreCamDuration;
+        
         private PlayerTrack _track;
         private PlayerMovement _playerMovement;
 
@@ -56,6 +61,15 @@ namespace KickinIt.Simulation.Player
         {
             _active = false;
             SetVirtualCameraActive(false);
+        }
+
+        public async UniTask PlayScoreCam(CancellationToken token)
+        {
+            Debug.Log("Playing score cam");
+            scoreCam.gameObject.SetActive(true);
+            await UniTask.Delay(TimeSpan.FromSeconds(scoreCamDuration), cancellationToken: token);
+            scoreCam.gameObject.SetActive(false);
+            Debug.Log("Stopping score cam");
         }
 
         private void SetVirtualCameraActive(bool isCameraActive)

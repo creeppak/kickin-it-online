@@ -8,22 +8,18 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: arena-2-transparent-barrier
-  m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 19b73d8f5b2fbdb1d8241eb0695938ff,
+    type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords:
-  - _ALPHAMODULATE_ON
-  - _SURFACE_TYPE_TRANSPARENT
+  m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
-  stringTagMap:
-    RenderType: Transparent
-  disabledShaderPasses:
-  - DepthOnly
-  - SHADOWCASTER
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -106,8 +102,10 @@ Material:
     - _Metallic: 0.043
     - _OcclusionStrength: 1
     - _Parallax: 0.005
+    - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _Scale_Noise: 13.73
     - _Smoothness: 0.252
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -118,8 +116,11 @@ Material:
     - _ZWrite: 0
     m_Colors:
     - _BaseColor: {r: 0.98039216, g: 0.024959456, b: 0, a: 0.83137256}
-    - _Color: {r: 0.98039216, g: 0.024959456, b: 0, a: 0.83137256}
+    - _Color: {r: 0, g: 0.98039216, b: 0.03861563, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _Noise_Alpha_Remap: {r: 0.4, g: 2.3, b: 0, a: 0}
+    - _Scroll_Speed_A: {r: 0.1, g: 0.1, b: 0, a: 0}
+    - _Scroll_Speed_B: {r: -0.1, g: -0.3, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &6435239902850762643

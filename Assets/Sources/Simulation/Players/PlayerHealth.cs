@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using KickinIt.Simulation.Gates;
 using KickinIt.Simulation.Players;
 using KickinIt.Simulation.Track;
 using R3;
@@ -14,20 +15,21 @@ namespace KickinIt.Simulation.Player
         [SerializeField] private UnityEvent onHealthDownUnity;
         [SerializeField] private UnityEvent onHealthOverUnity;
         
-        
         private PlayerTrack _playerTrack;
         private bool _immortal;
         
-        [Networked] public int HealthPoints { get; private set; }
+        [Networked] private int HealthPointsNetworked { get; set; }
+        [Networked] private PlayerRef LastGoalOwnerNetworked { get; set; }
 
-        public Observable<int> OnHealthDown => _onHealthDown;
+        public int HealthPoints => HealthPointsNetworked;
+        public Observable<HealthDownInfo> OnHealthDown => _onHealthDown;
         public Observable<int> OnHealthUpdated => _localHealthPoints;
-        public Observable<Unit> OnHealthOver => _onHealthOver;
+        public Observable<HealthOverInfo> OnHealthOver => _onHealthOver;
 
         private readonly ReactiveProperty<int> _localHealthPoints = new();
         
-        private readonly Subject<int> _onHealthDown = new();
-        private readonly Subject<Unit> _onHealthOver = new();
+        private readonly Subject<HealthDownInfo> _onHealthDown = new();
+        private readonly Subject<HealthOverInfo> _onHealthOver = new();
 
         [Inject]
         private void Configure(PlayerTrack playerTrack)
@@ -37,8 +39,8 @@ namespace KickinIt.Simulation.Player
 
         public void Initialize()
         {
-            _playerTrack.GatesTrigger.OnGoal
-                .Subscribe(_ => OnGoal())
+            _playerTrack.GoalProcessor.OnGoal
+                .Subscribe(OnGoal)
                 .AddTo(this);
         }
 
@@ -46,57 +48,68 @@ namespace KickinIt.Simulation.Player
         {
             var localHealthPoints = _localHealthPoints.Value;
             
-            _localHealthPoints.Value = HealthPoints;
+            _localHealthPoints.Value = HealthPointsNetworked;
             
             if (Object.HasStateAuthority)
             {
                 return; // ignore for server
             }
 
-            if (localHealthPoints == HealthPoints)
+            if (localHealthPoints == HealthPointsNetworked)
             {
                 return; // no changes, ignore
             }
 
-            if (HealthPoints <= 0)
+            if (HealthPointsNetworked <= 0)
             {
-                _onHealthOver.OnNext(Unit.Default);
+                _onHealthOver.OnNext(new HealthOverInfo { Initiator = LastGoalOwnerNetworked });
                 onHealthOverUnity?.Invoke();
                 return;
             }
 
-            if (HealthPoints < localHealthPoints)
+            if (HealthPointsNetworked < localHealthPoints)
             {
-                _onHealthDown.OnNext(HealthPoints);
+                _onHealthDown.OnNext(new HealthDownInfo
+                {
+                    ResultingHealthPoints = HealthPointsNetworked, 
+                    Initiator = LastGoalOwnerNetworked,
+                });
                 onHealthDownUnity?.Invoke();
             }
         }
 
         public void ResetHealth()
         {
-            HealthPoints = startHealth;
+            HealthPointsNetworked = startHealth;
             
-            _localHealthPoints.OnNext(HealthPoints);
+            _localHealthPoints.OnNext(HealthPointsNetworked);
         }
 
         public void SetImmortal(bool immortal) => _immortal = immortal;
 
-        private void OnGoal()
+        private void OnGoal(GoalInfo goalInfo)
         {
             if (!Object.HasStateAuthority) return; // register goals on server only
             if (_immortal) return; // ignore goal
-            if (HealthPoints <= 0) return; // ignore goal
+            if (HealthPointsNetworked <= 0) return; // ignore goal
 
-            HealthPoints--;
+            HealthPointsNetworked--;
+            LastGoalOwnerNetworked = goalInfo.GoalOwner;
 
-            if (HealthPoints > 0)
+            if (HealthPointsNetworked > 0)
             {
-                _onHealthDown.OnNext(HealthPoints);
+                _onHealthDown.OnNext(
+                    new HealthDownInfo
+                    {
+                        ResultingHealthPoints = HealthPointsNetworked, 
+                        Initiator = goalInfo.GoalOwner
+                    });
+                
                 onHealthDownUnity?.Invoke();
             }
             else
             {
-                _onHealthOver.OnNext(Unit.Default);
+                _onHealthOver.OnNext(new HealthOverInfo { Initiator = goalInfo.GoalOwner });
                 onHealthOverUnity?.Invoke();
             }
         }

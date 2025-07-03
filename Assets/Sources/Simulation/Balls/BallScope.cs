@@ -9,6 +9,8 @@ namespace KickinIt.Simulation.Balls
         public BallMovement ballMovement;
         public BallSpeedLevelFx ballSpeedLevelFx;
         public BallBody ballBody;
+        public BallOwning ballOwning;
+        public BallLookForward ballLookForward;
         
         protected override void Configure(IContainerBuilder builder)
         {
@@ -16,6 +18,8 @@ namespace KickinIt.Simulation.Balls
             builder.RegisterComponent(ballMovement);
             builder.RegisterComponent(ballSpeedLevelFx);
             builder.RegisterComponent(ballBody);
+            builder.RegisterComponent(ballOwning);
+            builder.RegisterComponent(ballLookForward);
         }
     }
 }

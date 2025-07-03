@@ -546,7 +546,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Next
+  m_text: Continue
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 47c2156477965b14e80fccaee3fc5078, type: 2}
   m_sharedMaterial: {fileID: -765871381180380393, guid: 47c2156477965b14e80fccaee3fc5078,
@@ -1388,7 +1388,7 @@ MonoBehaviour:
   winnerLabel: {fileID: 602396883543714349}
   clientAwaitLabel: {fileID: 3126051544026601917}
   winnerTextFormat: '{0}'
-  noWinnerPlayerName: Cosmic Entropy
+  noWinnerPlayerName: Nobody
   retryButton: {fileID: 1357022235364562084}
   quitToMenuButton: {fileID: 1007547131187032713}
 --- !u!224 &5743198942838920602 stripped

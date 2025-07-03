@@ -25,7 +25,6 @@ namespace KickinIt.Simulation.Balls
         private BallMovement _ballMovement;
         private List<SpeedLevelConfig> _sortedLevelConfigs;
         private SpeedLevelConfig _activeConfig;
-        private Transform _transform;
 
         [Inject]
         private void Construct(BallMovement ballMovement)
@@ -35,8 +34,6 @@ namespace KickinIt.Simulation.Balls
 
         private void Awake()
         {
-            _transform = transform;
-            
             _sortedLevelConfigs = levelConfigs
                 .OrderBy(config => config.stepThreshold)
                 .ToList();
@@ -65,8 +62,6 @@ namespace KickinIt.Simulation.Balls
             {
                 return;
             }
-            
-            _transform.forward = -_ballMovement.Velocity.normalized;
             
             var shouldEmit = _ballMovement.Velocity.magnitude > minSpeedToShowTrail;
             var fx = _activeConfig.particles;

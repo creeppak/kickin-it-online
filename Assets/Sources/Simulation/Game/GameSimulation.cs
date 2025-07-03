@@ -21,7 +21,7 @@ namespace KickinIt.Simulation.Game
             WaitingForPlayers,
             Countdown,
             InProgress,
-            PostGoalDelay,
+            ScoreCelebration,
             Finished
         }
 
@@ -33,7 +33,7 @@ namespace KickinIt.Simulation.Game
             StartMatch = 3,
             EndMatch = 4,
             ForceTerminate = 5,
-            StartPostGoalDelay = 6,
+            StartGoalCelebration = 6,
             ResumeMatch = 7,
             TryAgain = 8,
         }
@@ -60,6 +60,7 @@ namespace KickinIt.Simulation.Game
 
         [Networked] private Trigger LastFiredTrigger { get; set; }
         [Networked] private int WinnerIndex { get; set; }
+        [Networked] private PlayerRef LastScoredPlayer { get; set; }
 
         public Observable<SimulationPhase> Phase => _phase;
         public Observable<int> Countdown => _countdown;
@@ -67,7 +68,7 @@ namespace KickinIt.Simulation.Game
         public ReadOnlyReactiveProperty<int> PlayerCount => _playerManager.PlayerCount;
         public int PlayerReadyCount => _playerManager.PlayerReadyCount;
         public bool Active => Runner && Runner.IsRunning;
-        public IPlayer Winner => WinnerIndex >= 0 ? GetPlayer(WinnerIndex) : null;
+        public IPlayer Winner => WinnerIndex > 0 ? GetPlayer(WinnerIndex) : null;
 
         [Inject]
         private void Configure(SimulationArgs simulationArgs, GameNetwork network, PlayerManager playerManager,
@@ -200,7 +201,7 @@ namespace KickinIt.Simulation.Game
 
             _stateMachine.Configure(State.InProgress)
                 .SubstateOf(State.Active)
-                .Permit(Trigger.StartPostGoalDelay, State.PostGoalDelay)
+                .Permit(Trigger.StartGoalCelebration, State.ScoreCelebration)
                 .Permit(Trigger.EndMatch, State.Finished)
                 .OnEntry(() =>
                 {
@@ -217,16 +218,20 @@ namespace KickinIt.Simulation.Game
 
                     players.Select(player => player.OnHealthDown)
                         .Merge()
-                        .Subscribe(player =>
+                        .Subscribe(info =>
                         {
-                            _stateMachine.Fire(Trigger.StartPostGoalDelay);
+                            LastScoredPlayer = info.OriginalInfo.Initiator;
+                            _stateMachine.Fire(Trigger.StartGoalCelebration);
                         })
                         .AddTo(ref _currentStateBag);
 
                     players.Select(player => player.OnHealthOver)
                         .Merge()
-                        .Subscribe(downedPlayer =>
+                        .Subscribe(info =>
                         {
+                            LastScoredPlayer = info.OriginalInfo.Initiator;
+                            
+                            var downedPlayer = info.Player;
                             downedPlayer.SetInputEnabled(false);
                             
                             var playersAlive = players.Count(p => p.HealthPoints > 0);
@@ -247,7 +252,7 @@ namespace KickinIt.Simulation.Game
                                 return;
                             }
                             
-                            _stateMachine.Fire(Trigger.StartPostGoalDelay);
+                            _stateMachine.Fire(Trigger.StartGoalCelebration);
                         })
                         .AddTo(ref _currentStateBag);
                 })
@@ -263,15 +268,16 @@ namespace KickinIt.Simulation.Game
                     _ballSpawner.TryDespawnBall();
                 });
 
-            _stateMachine.Configure(State.PostGoalDelay)
+            _stateMachine.Configure(State.ScoreCelebration)
                 .SubstateOf(State.Active)
                 .Permit(Trigger.ResumeMatch, State.InProgress)
                 .OnEntry(() =>
                 {
-                    if (!Object.HasStateAuthority) return;
-
+                    // todo play score cam effect
+                    
                     Observable.Timer(TimeSpan.FromSeconds(postGoalDelay))
-                        .Subscribe(_ => _stateMachine.Fire(Trigger.ResumeMatch))
+                        .ObserveOnMainThread()
+                        .Subscribe(_ => StateMachineFireIfHost(Trigger.ResumeMatch))
                         .AddTo(ref _currentStateBag);
                 });
 
@@ -290,7 +296,8 @@ namespace KickinIt.Simulation.Game
             
             if (!Object.HasStateAuthority) return; // continue on server only
             
-            WinnerIndex = -1;
+            WinnerIndex = PlayerRef.None.AsIndex;
+            LastScoredPlayer = PlayerRef.None;
         }
 
         private void SyncStateMachine()
@@ -310,10 +317,20 @@ namespace KickinIt.Simulation.Game
             await _network.ShutdownSession();
         }
 
+        private void StateMachineFireIfHost(Trigger trigger)
+        {
+            if (!Object.HasStateAuthority)
+            {
+                return; // ignore on clients
+            }
+            
+            _stateMachine.Fire(trigger);
+        }
+
         private void OnStateMachineTransitioning(StateMachine<State, Trigger>.Transition obj)
         {
             _currentStateBag.Dispose(); // clear previous subscriptions
-            _currentStateBag = new DisposableBag(); // reset state for new state
+            _currentStateBag = new DisposableBag(); // reset bag for new state
             
             if (obj.Destination == State.Inactive) return; // the simulation was terminated, networked state won't get synchronized anymore
             

@@ -1,4 +1,6 @@
-﻿using Fusion;
+﻿using System.Threading;
+using Cysharp.Threading.Tasks;
+using Fusion;
 using KickinIt.Simulation.Players;
 using KickinIt.Simulation.Track;
 using R3;
@@ -20,6 +22,7 @@ namespace KickinIt.Simulation.Player
         private PlayerMovement _playerMovement;
         private PlayerBallBouncer _ballBouncer;
         private PlayerWinnerMark _winnerMark;
+        private PlayerCamera _playerCamera;
 
         public NetworkObject NetworkObject { get; }
         
@@ -36,14 +39,17 @@ namespace KickinIt.Simulation.Player
         public ReadOnlyReactiveProperty<Color> Color => _playerColor.MainColor;
         public bool IsHost => NetworkObject.HasStateAuthority;
 
-        public Observable<IPlayerSimulation> OnHealthDown => _playerHealth.OnHealthDown
-            .Select(_ => this as IPlayerSimulation);
+        public Observable<PlayerHealthDownInfo> OnHealthDown => _playerHealth.OnHealthDown
+            .Select(info => new PlayerHealthDownInfo(info, this));
 
-        public Observable<IPlayerSimulation> OnHealthOver => _playerHealth.OnHealthOver
-            .Select(_ => this as IPlayerSimulation);
+        public Observable<PlayerHealthOverInfo> OnHealthOver => _playerHealth.OnHealthOver
+            .Select(info => new PlayerHealthOverInfo(info, this));
 
         public ReadOnlyReactiveProperty<bool> IsReady => _playerReadinessSystem.IsReady;
         public string PlayerName => _fancyNameProvider.GetName(_playerRef.AsIndex - 1);
+        /// <summary>
+        /// Starts from 1. 0 is nobody.
+        /// </summary>
         public int PlayerIndex => _playerRef.AsIndex;
         public int HealthPoints => _playerHealth.HealthPoints;
 
@@ -58,8 +64,10 @@ namespace KickinIt.Simulation.Player
             PlayerTrack playerTrack,
             PlayerMovement playerMovement,
             PlayerBallBouncer ballBouncer,
-            PlayerWinnerMark winnerMark)
+            PlayerWinnerMark winnerMark, 
+            PlayerCamera playerCamera)
         {
+            _playerCamera = playerCamera;
             _winnerMark = winnerMark;
             _ballBouncer = ballBouncer;
             _playerMovement = playerMovement;
@@ -74,6 +82,8 @@ namespace KickinIt.Simulation.Player
         }
 
         public void SetReady(bool isReady) => _playerReadinessSystem.SetReady(isReady);
+
+        public UniTask PlayScoreCam(CancellationToken token) => _playerCamera.PlayScoreCam(token);
 
         public void ResetPlayer()
         {
@@ -93,7 +103,7 @@ namespace KickinIt.Simulation.Player
         
         public void InitializePlayer()
         {
-            _playerColor.PickRandomColor();
+            _playerColor.PickNextColor();
         }
 
         public void SetInputEnabled(bool enabled)

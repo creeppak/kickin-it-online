@@ -125,7 +125,7 @@ namespace KickinIt.Simulation.Players
                 var pushDirection = (ball.transform.position - worldCapsuleCenter).normalized;
                 var pushStrength = ball.CurrentMaxSpeed * pushForceScale;
                 
-                ball.Push(pushDirection * pushStrength);
+                ball.Push(pushDirection * pushStrength, gameObject);
                 ball.IncrementMaxSpeedStep();
             }
 

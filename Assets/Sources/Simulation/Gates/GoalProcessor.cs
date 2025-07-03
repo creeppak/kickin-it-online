@@ -1,24 +1,26 @@
-﻿using Fusion;
+﻿using System.Linq;
+using Fusion;
+using KickinIt.Simulation.Balls;
 using R3;
 using UnityEngine;
 using VContainer;
 
 namespace KickinIt.Simulation.Gates
 {
-    internal class GatesTrigger : NetworkBehaviour
+    internal class GoalProcessor : NetworkBehaviour
     {
         [SerializeField] private new BoxCollider collider;
         [SerializeField] private LayerMask ballMask;
         [SerializeField] private Color gizmoColor = Color.red;
         
         private readonly Collider[] _overlapBuffer = new Collider[8];
-        private readonly Subject<Unit> _onGoal = new();
+        private readonly Subject<GoalInfo> _onGoal = new();
         
         private Transform _colliderTransform;
         private Mesh _cubeMesh;
         private PhysicsScene _physicsScene;
 
-        public Observable<Unit> OnGoal => _onGoal;
+        public Observable<GoalInfo> OnGoal => _onGoal;
 
         [Inject]
         private void Configure(PhysicsScene physicsScene)
@@ -90,10 +92,13 @@ namespace KickinIt.Simulation.Gates
                 QueryTriggerInteraction.Collide // for whatever reason ignoring triggers skips the ball (which is not a trigger) todo: double check this
             );
 
-            if (overlapCount > 0)
-            {
-                _onGoal.OnNext(Unit.Default);
-            }
+            if (overlapCount <= 0) return;
+            
+            var ball = _overlapBuffer.First().GetComponent<Ball>();
+
+            var owner = ball.CurrentOwner;
+            
+            _onGoal.OnNext(new GoalInfo { GoalOwner = owner });
         }
     }
 }
