@@ -2,14 +2,14 @@
 
 This repository is a demonstration of a scalable multiplayer game architecture using Unity & Photon Fusion 2.
 
-**Please note:** The demo is still a work-in-progress and is not fully functional.
-
 ![Metagame Screenshot](Markdown/main-menu.png)
 ![New arena WIP](Markdown/homeland.gif)
 
+Check out this short demo video to see it in action: [Demo Video](https://youtu.be/APnbyL-8Pvo)
+
 ## Overview
 
-This project is a multiplayer game built on a scalable architecture that reimagines the classic pong game (but is 
+This project is a multiplayer game built on a scalable architecture that reimagines the classic pong game (but is
 actually a Crash Bash clone).
 In this game:
 - One user creates a session.
@@ -63,6 +63,7 @@ The core gameplay is a modern take on the classic pong game:
 Players can control their paddle using the following keys:
 - **A Key:** Move paddle to the left.
 - **D Key:** Move paddle to the right.
+- **Space Key:** To deflect the ball.
 
 ## Future Work
 
